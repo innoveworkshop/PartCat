@@ -18,8 +18,10 @@ public class MainApplication {
 	public static void main(String[] args) throws Exception {
 		// Open workspace.
 		PartCatWorkspace workspace = new PartCatWorkspace("/home/nathan/partcat-test");
+		System.out.println("PartCat Workspace\n");
 		
 		// Go through components.
+		System.out.println("Components:");
 		ListIterator<Component> iter = workspace.componentIterator();
 		while (iter.hasNext()) {
 			System.out.println(iter.next().toString());
