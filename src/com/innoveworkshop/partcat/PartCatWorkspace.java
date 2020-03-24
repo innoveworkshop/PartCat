@@ -27,7 +27,7 @@ public class PartCatWorkspace {
 	 * Opens a workspace from a given path.
 	 * 
 	 * @param path Path to the root of a PartCat workspace folder as a
-	 *             {@link #Path}.
+	 *             {@link Path}.
 	 *             
 	 * @throws WorkspaceNotFoundException If the specified path wasn't found or
 	 *                                    isn't a directory.
@@ -40,7 +40,7 @@ public class PartCatWorkspace {
 	 * Opens a workspace from a given string path.
 	 * 
 	 * @param path Path to the root of a PartCat workspace folder as a
-	 *             {@link #String}.
+	 *             {@link String}.
 	 *             
 	 * @throws WorkspaceNotFoundException If the specified path wasn't found or
 	 *                                    isn't a directory.
@@ -52,7 +52,7 @@ public class PartCatWorkspace {
 	/**
 	 * Gets the path to the workspace.
 	 * 
-	 * @return Path to the workspace as a {@link #Path}.
+	 * @return Path to the workspace as a {@link Path}.
 	 */
 	public Path getPath() {
 		return this.root_path;
@@ -62,7 +62,7 @@ public class PartCatWorkspace {
 	 * Sets the workspace path.
 	 * 
 	 * @param path Path to the root of a PartCat workspace folder as a
-	 *             {@link #Path}.
+	 *             {@link Path}.
 	 *             
 	 * @throws WorkspaceNotFoundException If the specified path wasn't found or
 	 *                                    isn't a directory.
