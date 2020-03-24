@@ -1,5 +1,7 @@
 package com.innoveworkshop.partcat;
 
+import com.innoveworkshop.partcat.components.Component;
+
 /**
  * The main application class.
  *
@@ -11,7 +13,10 @@ public class MainApplication {
 	 * 
 	 * @param args Command line arguments.
 	 */
-	public static void main(String[] args) {
-		System.out.println("Hello, World!");
+	public static void main(String[] args) throws Exception {
+		PartCatWorkspace workspace = new PartCatWorkspace("/home/nathan/partcat-test");
+		Component comp = new Component(workspace, "BC817");
+		
+		System.out.println(comp.toString());
 	}
 }

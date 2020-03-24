@@ -46,5 +46,4 @@ public class ComponentNotFoundException extends Exception {
 	public ComponentNotFoundException(String componentName, Throwable err) {
 		super("The component '" + componentName + "' wasn't found.", err);
 	}
-
 }
