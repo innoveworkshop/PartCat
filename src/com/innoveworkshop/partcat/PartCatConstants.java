@@ -8,6 +8,7 @@ package com.innoveworkshop.partcat;
 public final class PartCatConstants {
 	// File names.
 	public static final String MANIFEST_FILE  = "MANIFEST";
+	public static final String QUANTITY_FILE = "QUANTITY";
 	public static final String DATASHEET_FILE = "datasheet.pdf";
 	public static final String SPICE_MODEL_FILE = "model.mod";
 	public static final String NOTES_FILE = "notes.txt";

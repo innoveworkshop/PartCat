@@ -1,17 +1,16 @@
 package com.innoveworkshop.partcat.components;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
+import java.util.Map;
 
 import com.innoveworkshop.partcat.PartCatConstants;
 import com.innoveworkshop.partcat.PartCatWorkspace;
 import com.innoveworkshop.partcat.exceptions.WorkspaceNotOpenedException;
+import com.innoveworkshop.utilities.FileUtilities;
 
 /**
  * A component abstraction class. This represents a single populated component
@@ -23,7 +22,8 @@ public class Component {
 	private PartCatWorkspace workspace;
 	private Path path;
 	private String name;
-	private HashMap<String, String> properties;
+	private int quantity;
+	private ComponentProperties prop;
 	private String notes;
 	private boolean newly_created;
 
@@ -41,11 +41,13 @@ public class Component {
 		if (!workspace.isOpen())
 			throw new WorkspaceNotOpenedException();
 		
+		// Set default parameters.
 		this.workspace = workspace;
 		this.path = null;
 		this.name = null;
-		this.notes = null;
-		this.properties = new HashMap<String, String>();
+		this.setQuantity(0);
+		this.setNotes(null);
+		this.prop = new ComponentProperties();
 		this.newly_created = true;
 	}
 	
@@ -63,13 +65,15 @@ public class Component {
 	 * @throws IOException                 If something goes wrong when reading
 	 *                                     data from the files inside the
 	 *                                     component folder.
+	 * @throws Exception                   Something went wrong.
 	 */
 	public Component(PartCatWorkspace workspace, String name) throws WorkspaceNotOpenedException,
-																	FileNotFoundException,
-																	IOException {
+																	 FileNotFoundException,
+																	 IOException,
+																	 Exception {
 		// Initialize an empty object with a name.
 		this(workspace);
-		this.name = name;
+		this.setName(name);
 		
 		// Check if we are creating a new component or loading one.
 		if (exists(name)) {
@@ -96,24 +100,26 @@ public class Component {
 	 *                     files inside the component folder.
 	 */
 	protected void populateFromPath(Path path) throws IOException {
-		// TODO: Load properties.
+		// Load the manifest file.
+		Path manifest_path = path.resolve(PartCatConstants.MANIFEST_FILE);
+		prop.parseManifest(manifest_path);
+		
+		// Load the quantity file.
+		try {
+			// Get file path and set the quantity with its contents.
+			Path quantity_path = path.resolve(PartCatConstants.QUANTITY_FILE);
+			this.setQuantity(FileUtilities.slurpFile(quantity_path));
+		} catch (FileNotFoundException | UnsupportedEncodingException e) {
+			this.setQuantity(0);
+		}
 		
 		// Load the notes file.
 		try {
-			// Get file path.
+			// Get file path and set the notes property with its contents.
 			Path notes_path = path.resolve(PartCatConstants.NOTES_FILE);
-			File file = notes_path.toFile();
-			
-			// Read its contents.
-			FileInputStream inStream = new FileInputStream(file);
-			byte[] data = new byte[(int)file.length()];
-			inStream.read(data);
-			inStream.close();
-			
-			// Set the notes property.
-			notes = new String(data, "UTF-8");
+			this.setNotes(FileUtilities.slurpFile(notes_path));
 		} catch (FileNotFoundException | UnsupportedEncodingException e) {
-			notes = null;
+			this.setNotes(null);
 		}
 	}
 	
@@ -137,6 +143,15 @@ public class Component {
 	public static boolean exists(PartCatWorkspace workspace, String name) {
 		return true;
 	}
+	
+	/**
+	 * Gets the path to the component folder as a {@link Path}.
+	 * 
+	 * @return Path to the component folder.
+	 */
+	public Path getPath() {
+		return this.path;
+	}
 
 	/**
 	 * Gets the component name.
@@ -145,6 +160,49 @@ public class Component {
 	 */
 	public String getName() {
 		return this.name;
+	}
+	
+	/**
+	 * Sets the component name.
+	 * 
+	 * @param name Name of the component.
+	 * 
+	 * @throws Exception If the name is already set. The {@link #rename()}
+	 *                   function should be used instead.
+	 */
+	public void setName(String name) throws Exception {
+		if (this.name != null)
+			throw new Exception("Cannot set the name if the component " +
+					"already has one");
+		
+		this.name = name;
+	}
+	
+	/**
+	 * Gets the quantity of a component.
+	 * 
+	 * @return The quantity of the component.
+	 */
+	public int getQuantity() {
+		return this.quantity;
+	}
+	
+	/**
+	 * Sets the quantity of the component.
+	 * 
+	 * @param quantity New quantity of the component.
+	 */
+	public void setQuantity(int quantity) {
+		this.quantity = quantity;
+	}
+	
+	/**
+	 * Sets the quantity of the component from a {@link String}.
+	 * 
+	 * @param quantity Quantity number as a {@link String}.
+	 */
+	public void setQuantity(String quantity) {
+		this.quantity = Integer.parseInt(quantity.trim());
 	}
 
 	/**
@@ -185,11 +243,24 @@ public class Component {
 		strBuilder.append("Name: ");
 		strBuilder.append(this.getName());
 		strBuilder.append("\nPath:");
-		strBuilder.append(path.toString());
+		strBuilder.append(this.getPath().toString());
 		strBuilder.append("\nNewly Created: ");
 		strBuilder.append(this.isNewlyCreated());
-		// TODO: Go through properties.
-		strBuilder.append("\nNotes: ");
+		strBuilder.append("\nQuantity: ");
+		strBuilder.append(this.getQuantity());
+		
+		// Go through properties.
+		strBuilder.append("\nProperties:\n");
+		for (Map.Entry<String, String> entry : prop.entrySet()) {
+			strBuilder.append("\t");
+			strBuilder.append(entry.getKey());
+			strBuilder.append("\t");
+			strBuilder.append(entry.getValue());
+			strBuilder.append("\n");
+		}
+		
+		// Add the notes.
+		strBuilder.append("Notes: ");
 		strBuilder.append(this.getNotes());
 		
 		return strBuilder.toString();
