@@ -1,6 +1,10 @@
 package com.innoveworkshop.partcat.components;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -56,9 +60,13 @@ public class Component {
 	 *                                     folder path.
 	 * @throws FileNotFoundException       If the path to the component folder
 	 *                                     either doesn't exist or isn't a folder.
+	 * @throws IOException                 If something goes wrong when reading
+	 *                                     data from the files inside the
+	 *                                     component folder.
 	 */
 	public Component(PartCatWorkspace workspace, String name) throws WorkspaceNotOpenedException,
-																	FileNotFoundException {
+																	FileNotFoundException,
+																	IOException {
 		// Initialize an empty object with a name.
 		this(workspace);
 		this.name = name;
@@ -83,10 +91,30 @@ public class Component {
 	 * Populates the object with information from a component path.
 	 * 
 	 * @param path Path to the component folder.
+	 * 
+	 * @throws IOException If something goes wrong when reading data from the
+	 *                     files inside the component folder.
 	 */
-	protected void populateFromPath(Path path) {
+	protected void populateFromPath(Path path) throws IOException {
 		// TODO: Load properties.
-		// TODO: Load notes.
+		
+		// Load the notes file.
+		try {
+			// Get file path.
+			Path notes_path = path.resolve(PartCatConstants.NOTES_FILE);
+			File file = notes_path.toFile();
+			
+			// Read its contents.
+			FileInputStream inStream = new FileInputStream(file);
+			byte[] data = new byte[(int)file.length()];
+			inStream.read(data);
+			inStream.close();
+			
+			// Set the notes property.
+			notes = new String(data, "UTF-8");
+		} catch (FileNotFoundException | UnsupportedEncodingException e) {
+			notes = null;
+		}
 	}
 	
 	/**
@@ -129,6 +157,15 @@ public class Component {
 	}
 	
 	/**
+	 * Sets the component notes.
+	 * 
+	 * @param notes Notes to be set to this component.
+	 */
+	public void setNotes(String notes) {
+		this.notes = notes;
+	}
+	
+	/**
 	 * Checks if a component has been newly created and hasn't been saved yet.
 	 * 
 	 * @return True if the component only exists in memory.
@@ -152,7 +189,7 @@ public class Component {
 		strBuilder.append("\nNewly Created: ");
 		strBuilder.append(this.isNewlyCreated());
 		// TODO: Go through properties.
-		strBuilder.append("\nNotes:\n");
+		strBuilder.append("\nNotes: ");
 		strBuilder.append(this.getNotes());
 		
 		return strBuilder.toString();
