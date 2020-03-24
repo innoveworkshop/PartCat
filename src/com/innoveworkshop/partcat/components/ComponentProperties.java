@@ -34,10 +34,14 @@ public class ComponentProperties extends HashMap<String, String> {
 		
 		// Read manifest line-by-line.
 		while (input.hasNextLine()) {
-			String line = input.nextLine();
-			Matcher matcher = pattern.matcher(line);
+			String line = input.nextLine().trim();
+			
+			// Ignore empty lines.
+			if (line.isEmpty())
+				continue;
 			
 			// Only do something if a valid manifest line was found.
+			Matcher matcher = pattern.matcher(line);
 			if (matcher.find()) {
 				this.put(matcher.group(1), matcher.group(2));
 			} else {
