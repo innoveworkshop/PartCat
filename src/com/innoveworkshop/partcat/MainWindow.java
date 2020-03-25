@@ -1,7 +1,6 @@
 package com.innoveworkshop.partcat;
 
 import java.awt.Color;
-import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -39,7 +38,7 @@ public class MainWindow {
 	private JTable tblProperties;
 
 	/**
-	 * Create the application.
+	 * Creates the main frame.
 	 */
 	public MainWindow() {
 		initialize();
@@ -67,7 +66,7 @@ public class MainWindow {
 		frmPartcat.getContentPane().setLayout(springLayout);
 		
 		JSplitPane splitPane = new JSplitPane();
-		splitPane.setResizeWeight(0.4);
+		splitPane.setResizeWeight(0.3);
 		springLayout.putConstraint(SpringLayout.NORTH, splitPane, 0, SpringLayout.NORTH, frmPartcat.getContentPane());
 		springLayout.putConstraint(SpringLayout.WEST, splitPane, 0, SpringLayout.WEST, frmPartcat.getContentPane());
 		springLayout.putConstraint(SpringLayout.SOUTH, splitPane, 0, SpringLayout.SOUTH, frmPartcat.getContentPane());
@@ -79,36 +78,32 @@ public class MainWindow {
 		SpringLayout sl_leftPanel = new SpringLayout();
 		leftPanel.setLayout(sl_leftPanel);
 		
+		JScrollPane sclTree = new JScrollPane();
+		sl_leftPanel.putConstraint(SpringLayout.NORTH, sclTree, 5, SpringLayout.NORTH, leftPanel);
+		sl_leftPanel.putConstraint(SpringLayout.WEST, sclTree, 5, SpringLayout.WEST, leftPanel);
+		sl_leftPanel.putConstraint(SpringLayout.EAST, sclTree, -5, SpringLayout.EAST, leftPanel);
+		leftPanel.add(sclTree);
+		
 		JTree treeComponents = new JTree();
 		sl_leftPanel.putConstraint(SpringLayout.NORTH, treeComponents, 5, SpringLayout.NORTH, leftPanel);
 		sl_leftPanel.putConstraint(SpringLayout.WEST, treeComponents, 5, SpringLayout.WEST, leftPanel);
 		sl_leftPanel.putConstraint(SpringLayout.EAST, treeComponents, -5, SpringLayout.EAST, leftPanel);
-		leftPanel.add(treeComponents);
-		
-		JPanel searchPanel = new JPanel();
-		sl_leftPanel.putConstraint(SpringLayout.NORTH, searchPanel, -35, SpringLayout.SOUTH, leftPanel);
-		sl_leftPanel.putConstraint(SpringLayout.WEST, searchPanel, 5, SpringLayout.WEST, leftPanel);
-		sl_leftPanel.putConstraint(SpringLayout.SOUTH, searchPanel, -5, SpringLayout.SOUTH, leftPanel);
-		sl_leftPanel.putConstraint(SpringLayout.EAST, searchPanel, -5, SpringLayout.EAST, leftPanel);
-		sl_leftPanel.putConstraint(SpringLayout.SOUTH, treeComponents, 0, SpringLayout.NORTH, searchPanel);
-		leftPanel.add(searchPanel);
-		SpringLayout sl_searchPanel = new SpringLayout();
-		searchPanel.setLayout(sl_searchPanel);
+		sclTree.setViewportView(treeComponents);
 		
 		txtSearch = new JTextField();
-		sl_searchPanel.putConstraint(SpringLayout.NORTH, txtSearch, 5, SpringLayout.NORTH, searchPanel);
-		sl_searchPanel.putConstraint(SpringLayout.WEST, txtSearch, 0, SpringLayout.WEST, searchPanel);
+		sl_leftPanel.putConstraint(SpringLayout.WEST, txtSearch, 0, SpringLayout.WEST, sclTree);
+		leftPanel.add(txtSearch);
 		txtSearch.setToolTipText("Search");
-		searchPanel.add(txtSearch);
 		txtSearch.setColumns(10);
 		
 		JButton btnSearch = new JButton("Search");
-		sl_searchPanel.putConstraint(SpringLayout.WEST, btnSearch, -90, SpringLayout.EAST, searchPanel);
-		sl_searchPanel.putConstraint(SpringLayout.SOUTH, txtSearch, 0, SpringLayout.SOUTH, btnSearch);
-		sl_searchPanel.putConstraint(SpringLayout.EAST, txtSearch, -5, SpringLayout.WEST, btnSearch);
-		sl_searchPanel.putConstraint(SpringLayout.NORTH, btnSearch, 5, SpringLayout.NORTH, searchPanel);
-		sl_searchPanel.putConstraint(SpringLayout.EAST, btnSearch, -5, SpringLayout.EAST, searchPanel);
-		searchPanel.add(btnSearch);
+		sl_leftPanel.putConstraint(SpringLayout.NORTH, txtSearch, 0, SpringLayout.NORTH, btnSearch);
+		sl_leftPanel.putConstraint(SpringLayout.SOUTH, txtSearch, 0, SpringLayout.SOUTH, btnSearch);
+		sl_leftPanel.putConstraint(SpringLayout.EAST, txtSearch, -5, SpringLayout.WEST, btnSearch);
+		sl_leftPanel.putConstraint(SpringLayout.SOUTH, sclTree, -5, SpringLayout.NORTH, btnSearch);
+		sl_leftPanel.putConstraint(SpringLayout.SOUTH, btnSearch, -5, SpringLayout.SOUTH, leftPanel);
+		sl_leftPanel.putConstraint(SpringLayout.EAST, btnSearch, 0, SpringLayout.EAST, sclTree);
+		leftPanel.add(btnSearch);
 		
 		JPanel rightPanel = new JPanel();
 		splitPane.setRightComponent(rightPanel);
