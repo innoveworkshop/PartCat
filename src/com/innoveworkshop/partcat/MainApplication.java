@@ -1,5 +1,6 @@
 package com.innoveworkshop.partcat;
 
+import java.awt.EventQueue;
 import java.util.ListIterator;
 
 import com.innoveworkshop.partcat.components.Component;
@@ -26,5 +27,16 @@ public class MainApplication {
 		while (iter.hasNext()) {
 			System.out.println(iter.next().toString());
 		}
+		
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					MainWindow window = new MainWindow();
+					window.show();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
 	}
 }
