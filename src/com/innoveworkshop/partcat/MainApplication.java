@@ -1,9 +1,6 @@
 package com.innoveworkshop.partcat;
 
 import java.awt.EventQueue;
-import java.util.ListIterator;
-
-import com.innoveworkshop.partcat.components.Component;
 
 /**
  * The main application class.
@@ -11,6 +8,8 @@ import com.innoveworkshop.partcat.components.Component;
  * @author Nathan Campos <nathan@innoveworkshop.com>
  */
 public class MainApplication {
+	private static PartCatWorkspace workspace;
+	
 	/**
 	 * Application's main entry point.
 	 * 
@@ -18,21 +17,15 @@ public class MainApplication {
 	 */
 	public static void main(String[] args) throws Exception {
 		// Open workspace.
-		PartCatWorkspace workspace = new PartCatWorkspace("/home/nathan/partcat-test");
+		workspace = new PartCatWorkspace("/home/nathan/partcat-test");
 		System.out.println("PartCat Workspace\n");
-		
-		// Go through components.
-		System.out.println("Components:");
-		ListIterator<Component> iter = workspace.componentIterator();
-		while (iter.hasNext()) {
-			System.out.println(iter.next().toString());
-		}
 		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
 					MainWindow window = new MainWindow();
 					window.show();
+					window.setComponentsViewIterator(workspace.componentIterator());
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

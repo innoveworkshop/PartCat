@@ -2,7 +2,6 @@ package com.innoveworkshop.partcat.components;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
@@ -109,7 +108,7 @@ public class Component {
 			// Get file path and set the quantity with its contents.
 			Path quantity_path = path.resolve(PartCatConstants.QUANTITY_FILE);
 			this.setQuantity(FileUtilities.slurpFile(quantity_path));
-		} catch (FileNotFoundException | UnsupportedEncodingException e) {
+		} catch (Exception e) {
 			this.setQuantity(0);
 		}
 		
@@ -118,7 +117,7 @@ public class Component {
 			// Get file path and set the notes property with its contents.
 			Path notes_path = path.resolve(PartCatConstants.NOTES_FILE);
 			this.setNotes(FileUtilities.slurpFile(notes_path));
-		} catch (FileNotFoundException | UnsupportedEncodingException e) {
+		} catch (Exception e) {
 			this.setNotes(null);
 		}
 	}

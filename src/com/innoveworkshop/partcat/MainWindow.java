@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.util.ListIterator;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -26,6 +27,10 @@ import javax.swing.SpringLayout;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableModel;
 
+import com.innoveworkshop.partcat.components.Component;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.DefaultMutableTreeNode;
+
 /**
  * Our main window class.
  *
@@ -33,8 +38,11 @@ import javax.swing.table.DefaultTableModel;
  */
 public class MainWindow {
 	private JFrame frmPartcat;
+	private JTree treeComponents;
 	private JTextField txtSearch;
 	private JTextField txtName;
+	private JSpinner spnQuantity;
+	private JTextArea txtNotes;
 	private JTable tblProperties;
 
 	/**
@@ -42,6 +50,31 @@ public class MainWindow {
 	 */
 	public MainWindow() {
 		initialize();
+	}
+	
+	/**
+	 * Sets the components tree view iterator. This will repopulate the control.
+	 * 
+	 * @param components Components list iterator.
+	 */
+	public void setComponentsViewIterator(ListIterator<Component> components) {
+		// Create the tree root node.
+		DefaultMutableTreeNode root = new DefaultMutableTreeNode("Components");
+		
+		// Go through components.
+		System.out.println("Components:");
+		while (components.hasNext()) {
+			Component comp = components.next();
+			
+			System.out.println(comp.toString());
+			
+			// Add a node to the tree.
+			DefaultMutableTreeNode node = new DefaultMutableTreeNode(comp.getName());
+			root.add(node);
+		}
+		
+		// Set the tree model.
+		treeComponents.setModel(new DefaultTreeModel(root));
 	}
 
 	/**
@@ -84,7 +117,7 @@ public class MainWindow {
 		sl_leftPanel.putConstraint(SpringLayout.EAST, sclTree, -5, SpringLayout.EAST, leftPanel);
 		leftPanel.add(sclTree);
 		
-		JTree treeComponents = new JTree();
+		treeComponents = new JTree();
 		sl_leftPanel.putConstraint(SpringLayout.NORTH, treeComponents, 5, SpringLayout.NORTH, leftPanel);
 		sl_leftPanel.putConstraint(SpringLayout.WEST, treeComponents, 5, SpringLayout.WEST, leftPanel);
 		sl_leftPanel.putConstraint(SpringLayout.EAST, treeComponents, -5, SpringLayout.EAST, leftPanel);
@@ -138,7 +171,7 @@ public class MainWindow {
 		sl_rightPanel.putConstraint(SpringLayout.WEST, lblQuantity, 0, SpringLayout.WEST, lblName);
 		rightPanel.add(lblQuantity);
 		
-		JSpinner spnQuantity = new JSpinner();
+		spnQuantity = new JSpinner();
 		sl_rightPanel.putConstraint(SpringLayout.NORTH, spnQuantity, 28, SpringLayout.NORTH, rightPanel);
 		sl_rightPanel.putConstraint(SpringLayout.WEST, spnQuantity, 8, SpringLayout.EAST, lblQuantity);
 		sl_rightPanel.putConstraint(SpringLayout.SOUTH, lblQuantity, 0, SpringLayout.SOUTH, spnQuantity);
@@ -175,7 +208,7 @@ public class MainWindow {
 		sl_rightPanel.putConstraint(SpringLayout.SOUTH, tblProperties, -5, SpringLayout.SOUTH, rightPanel);
 		sl_rightPanel.putConstraint(SpringLayout.EAST, tblProperties, 0, SpringLayout.EAST, txtName);
 		
-		JTextArea txtNotes = new JTextArea();
+		txtNotes = new JTextArea();
 		txtNotes.setText("Notes");
 		txtNotes.setToolTipText("Notes");
 		txtNotes.setWrapStyleWord(true);
