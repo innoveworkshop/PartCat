@@ -25,11 +25,18 @@ import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SpringLayout;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.table.DefaultTableModel;
 
 import com.innoveworkshop.partcat.components.Component;
+import com.innoveworkshop.partcat.exceptions.ComponentNotFoundException;
+
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.SpinnerNumberModel;
 
 /**
  * Our main window class.
@@ -37,6 +44,9 @@ import javax.swing.tree.DefaultMutableTreeNode;
  * @author Nathan Campos <nathan@innoveworkshop.com>
  */
 public class MainWindow {
+	private PartCatWorkspace workspace;
+	private Component current_component;
+	
 	private JFrame frmPartcat;
 	private JTree treeComponents;
 	private JTextField txtSearch;
@@ -44,27 +54,59 @@ public class MainWindow {
 	private JSpinner spnQuantity;
 	private JTextArea txtNotes;
 	private JTable tblProperties;
+	private JButton btnDatasheet;
+	private JButton btnModel;
 
 	/**
 	 * Creates the main frame.
+	 * @wbp.parser.constructor
 	 */
 	public MainWindow() {
+		// Clear the state variables.
+		workspace = null;
+		current_component = null;
+		
+		// Set the look and feel.
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (Exception e) {
+			try {
+				System.err.println("Couldn't set the correct look and feel " +
+						"for this platform. Switching to default");
+				UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+		}
+		
+		// Initialize the UI controls.
 		initialize();
+	}
+
+	/**
+	 * Creates the main frame with a {@link PartCatWorkspace} already set.
+	 * 
+	 * @param workspace Opened PartCat workspace.
+	 */
+	public MainWindow(PartCatWorkspace workspace) {
+		this();
+		this.setWorkspace(workspace);
 	}
 	
 	/**
 	 * Sets the components tree view iterator. This will repopulate the control.
 	 * 
-	 * @param components Components list iterator.
+	 * @param iter Components list iterator.
+	 * @see {@link Component.componentIterator()}
 	 */
-	public void setComponentsViewIterator(ListIterator<Component> components) {
+	public void setComponentsViewIterator(ListIterator<Component> iter) {
 		// Create the tree root node.
 		DefaultMutableTreeNode root = new DefaultMutableTreeNode("Components");
 		
 		// Go through components.
 		System.out.println("Components:");
-		while (components.hasNext()) {
-			Component comp = components.next();
+		while (iter.hasNext()) {
+			Component comp = iter.next();
 			
 			System.out.println(comp.toString());
 			
@@ -75,6 +117,56 @@ public class MainWindow {
 		
 		// Set the tree model.
 		treeComponents.setModel(new DefaultTreeModel(root));
+	}
+	
+	/**
+	 * Populates the view/edit area with data from a given component.
+	 * 
+	 * @param component Component to be shown/edited.
+	 */
+	protected void showComponent(Component component) {
+		// Set text items.
+		txtName.setText(component.getName());
+		spnQuantity.setValue(Integer.valueOf(component.getQuantity()));
+		if (component.hasNotes())
+			txtNotes.setText(component.getNotes());
+		
+		// Enable the buttons we have files for.
+		btnDatasheet.setEnabled(component.hasDatasheet());
+		btnModel.setEnabled(component.hasSPICEModel());
+	}
+	
+	/**
+	 * Sets the current shown component in the view.
+	 * 
+	 * @param component Component to be shown/edited.
+	 */
+	public void setCurrentComponent(Component component) {
+		current_component = component;
+		this.showComponent(current_component);
+	}
+	
+	/**
+	 * Sets our current working workspace.
+	 * 
+	 * @param workspace Opened PartCat workspace.
+	 */
+	public void setWorkspace(PartCatWorkspace workspace) {
+		this.workspace = workspace;
+	}
+
+	/**
+	 * Shows the main window frame.
+	 */
+	public void show() {
+		frmPartcat.setVisible(true);
+	}
+
+	/**
+	 * Hides the main window frame.
+	 */
+	public void hide() {
+		frmPartcat.setVisible(false);
 	}
 
 	/**
@@ -118,6 +210,21 @@ public class MainWindow {
 		leftPanel.add(sclTree);
 		
 		treeComponents = new JTree();
+		treeComponents.addTreeSelectionListener(new TreeSelectionListener() {
+			public void valueChanged(TreeSelectionEvent event) {
+				try {
+					// Get component from the node name.
+					DefaultMutableTreeNode node = (DefaultMutableTreeNode)event.getPath().getLastPathComponent();
+					Component comp = workspace.getComponent((String)node.getUserObject());
+					
+					System.out.println(comp.toString());
+					setCurrentComponent(comp);
+				} catch (ComponentNotFoundException e) {
+					e.printStackTrace();
+					// TODO: Show error dialog.
+				}
+			}
+		});
 		sl_leftPanel.putConstraint(SpringLayout.NORTH, treeComponents, 5, SpringLayout.NORTH, leftPanel);
 		sl_leftPanel.putConstraint(SpringLayout.WEST, treeComponents, 5, SpringLayout.WEST, leftPanel);
 		sl_leftPanel.putConstraint(SpringLayout.EAST, treeComponents, -5, SpringLayout.EAST, leftPanel);
@@ -172,6 +279,7 @@ public class MainWindow {
 		rightPanel.add(lblQuantity);
 		
 		spnQuantity = new JSpinner();
+		spnQuantity.setModel(new SpinnerNumberModel(Integer.valueOf(0), null, null, Integer.valueOf(1)));
 		sl_rightPanel.putConstraint(SpringLayout.NORTH, spnQuantity, 28, SpringLayout.NORTH, rightPanel);
 		sl_rightPanel.putConstraint(SpringLayout.WEST, spnQuantity, 8, SpringLayout.EAST, lblQuantity);
 		sl_rightPanel.putConstraint(SpringLayout.SOUTH, lblQuantity, 0, SpringLayout.SOUTH, spnQuantity);
@@ -187,10 +295,10 @@ public class MainWindow {
 		tblProperties = new JTable();
 		extrasPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 0));
 		
-		JButton btnDatasheet = new JButton("Datasheet");
+		btnDatasheet = new JButton("Datasheet");
 		extrasPanel.add(btnDatasheet);
 		
-		JButton btnModel = new JButton("Model");
+		btnModel = new JButton("Model");
 		extrasPanel.add(btnModel);
 		
 		JButton btnExtras = new JButton("Extras");
@@ -244,12 +352,5 @@ public class MainWindow {
 			}
 		});
 		sclTable.setViewportView(tblProperties);
-	}
-
-	/**
-	 * Shows the main window frame.
-	 */
-	public void show() {
-		frmPartcat.setVisible(true);
 	}
 }

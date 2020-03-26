@@ -178,6 +178,15 @@ public class Component {
 	}
 	
 	/**
+	 * Gets the properties of this component.
+	 * 
+	 * @return The component properties.
+	 */
+	public ComponentProperties getProperties() {
+		return this.prop;
+	}
+	
+	/**
 	 * Gets the quantity of a component.
 	 * 
 	 * @return The quantity of the component.
@@ -220,6 +229,36 @@ public class Component {
 	 */
 	public void setNotes(String notes) {
 		this.notes = notes;
+	}
+	
+	/**
+	 * Checks if a component has notes.
+	 * 
+	 * @return True if the component has notes.
+	 */
+	public boolean hasNotes() {
+		if (notes == null)
+			return false;
+		
+		return !notes.isEmpty();
+	}
+	
+	/**
+	 * Checks if a component has a datasheet file associated with it.
+	 * 
+	 * @return True if the component has a datasheet file available.
+	 */
+	public boolean hasDatasheet() {
+		return path.resolve(PartCatConstants.DATASHEET_FILE).toFile().exists();
+	}
+	
+	/**
+	 * Checks if a component has a SPICE model file associated with it.
+	 * 
+	 * @return True if the component has a SPICE model file available.
+	 */
+	public boolean hasSPICEModel() {
+		return path.resolve(PartCatConstants.SPICE_MODEL_FILE).toFile().exists();
 	}
 	
 	/**

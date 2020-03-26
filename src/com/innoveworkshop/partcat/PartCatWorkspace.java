@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 import com.innoveworkshop.partcat.components.Component;
+import com.innoveworkshop.partcat.exceptions.ComponentNotFoundException;
 import com.innoveworkshop.partcat.exceptions.WorkspaceNotFoundException;
 
 /**
@@ -105,6 +106,26 @@ public class PartCatWorkspace {
 		
 		this.root_path = path;
 		this.opened = true;
+	}
+	
+	/**
+	 * Gets a component from this workspace by its name.
+	 * 
+	 * @param  name Name of the component to search for.
+	 * @return      The found component.
+	 * 
+	 * @throws ComponentNotFoundException If the name didn't match any components.
+	 */
+	public Component getComponent(String name) throws ComponentNotFoundException {
+		ListIterator<Component> iter = components.listIterator();
+		
+		while (iter.hasNext()) {
+			Component comp = iter.next();
+			if (comp.getName().equals(name))
+				return comp;
+		}
+		
+		throw new ComponentNotFoundException(name);
 	}
 	
 	/**

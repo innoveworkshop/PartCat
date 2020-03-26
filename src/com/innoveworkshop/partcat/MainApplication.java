@@ -23,7 +23,7 @@ public class MainApplication {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					MainWindow window = new MainWindow();
+					MainWindow window = new MainWindow(workspace);
 					window.show();
 					window.setComponentsViewIterator(workspace.componentIterator());
 				} catch (Exception e) {
