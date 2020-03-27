@@ -1,4 +1,4 @@
-package com.innoveworkshop.partcat;
+package com.innoveworkshop.partcat.ui;
 
 import java.awt.Color;
 import java.awt.FlowLayout;
@@ -25,21 +25,18 @@ import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.SpringLayout;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.table.DefaultTableModel;
-
-import com.innoveworkshop.partcat.components.Component;
-import com.innoveworkshop.partcat.components.ComponentProperties;
-import com.innoveworkshop.partcat.exceptions.ComponentNotFoundException;
-
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.event.TreeSelectionListener;
 import javax.swing.event.TreeSelectionEvent;
-import javax.swing.SpinnerNumberModel;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+
+import com.innoveworkshop.partcat.PartCatWorkspace;
+import com.innoveworkshop.partcat.components.Component;
 
 /**
  * Our main window class.
@@ -47,7 +44,6 @@ import javax.swing.SpinnerNumberModel;
  * @author Nathan Campos <nathan@innoveworkshop.com>
  */
 public class MainWindow {
-	private PartCatWorkspace workspace;
 	private Component current_component;
 	
 	private JFrame frmPartcat;
@@ -59,17 +55,17 @@ public class MainWindow {
 	private JTable tblProperties;
 	private JButton btnDatasheet;
 	private JButton btnModel;
+	private JButton btnExtras;
 
 	/**
 	 * Creates the main frame.
+	 * 
 	 * @wbp.parser.constructor
 	 */
 	public MainWindow() {
-		// Clear the state variables.
-		workspace = null;
 		current_component = null;
 		
-		// Set the look and feel.
+		// Set the look and feel to be more native looking.
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (Exception e) {
@@ -83,7 +79,8 @@ public class MainWindow {
 		}
 		
 		// Initialize the UI controls.
-		initialize();
+		this.initializeUIControls();
+		this.clearComponentView();
 	}
 
 	/**
@@ -106,16 +103,9 @@ public class MainWindow {
 		// Create the tree root node.
 		DefaultMutableTreeNode root = new DefaultMutableTreeNode("Components");
 		
-		// Go through components.
-		System.out.println("Components:");
+		// Go through components adding them to the tree.
 		while (iter.hasNext()) {
-			Component comp = iter.next();
-			
-			System.out.println(comp.toString());
-			
-			// Add a node to the tree.
-			DefaultMutableTreeNode node = new DefaultMutableTreeNode(comp.getName());
-			root.add(node);
+			root.add(new ComponentTreeNode(iter.next()));
 		}
 		
 		// Set the tree model.
@@ -131,15 +121,37 @@ public class MainWindow {
 		// Set text items.
 		txtName.setText(component.getName());
 		spnQuantity.setValue(Integer.valueOf(component.getQuantity()));
-		if (component.hasNotes())
+		if (component.hasNotes()) {
 			txtNotes.setText(component.getNotes());
+		} else {
+			txtNotes.setText("");
+		}
 		
 		// Enable the buttons we have files for.
 		btnDatasheet.setEnabled(component.hasDatasheet());
 		btnModel.setEnabled(component.hasSPICEModel());
+		btnExtras.setEnabled(true);
 		
 		// Populate the table with data.
 		this.setPropertiesTableContents(component.getProperties());
+	}
+	
+	/**
+	 * Clears the component view area.
+	 */
+	protected void clearComponentView() {
+		// Text controls.
+		txtName.setText("");
+		spnQuantity.setValue(Integer.valueOf(0));
+		txtNotes.setText("");
+		
+		// Buttons.
+		btnDatasheet.setEnabled(false);
+		btnModel.setEnabled(false);
+		btnExtras.setEnabled(false);
+		
+		// Table.
+		this.clearPropertiesTable();
 	}
 	
 	/**
@@ -181,7 +193,6 @@ public class MainWindow {
 	 * @param workspace Opened PartCat workspace.
 	 */
 	public void setWorkspace(PartCatWorkspace workspace) {
-		this.workspace = workspace;
 	}
 
 	/**
@@ -201,7 +212,7 @@ public class MainWindow {
 	/**
 	 * Initialize the contents of the frame.
 	 */
-	private void initialize() {
+	private void initializeUIControls() {
 		frmPartcat = new JFrame();
 		frmPartcat.setTitle("PartCat");
 		frmPartcat.setBounds(100, 100, 645, 384);
@@ -241,17 +252,7 @@ public class MainWindow {
 		treeComponents = new JTree();
 		treeComponents.addTreeSelectionListener(new TreeSelectionListener() {
 			public void valueChanged(TreeSelectionEvent event) {
-				try {
-					// Get component from the node name.
-					DefaultMutableTreeNode node = (DefaultMutableTreeNode)event.getPath().getLastPathComponent();
-					Component comp = workspace.getComponent((String)node.getUserObject());
-					
-					System.out.println(comp.toString());
-					setCurrentComponent(comp);
-				} catch (ComponentNotFoundException e) {
-					e.printStackTrace();
-					// TODO: Show error dialog.
-				}
+				componentTreeValueChanged(event);
 			}
 		});
 		sl_leftPanel.putConstraint(SpringLayout.NORTH, treeComponents, 5, SpringLayout.NORTH, leftPanel);
@@ -330,7 +331,7 @@ public class MainWindow {
 		btnModel = new JButton("Model");
 		extrasPanel.add(btnModel);
 		
-		JButton btnExtras = new JButton("Extras");
+		btnExtras = new JButton("Extras");
 		extrasPanel.add(btnExtras);
 		
 		JScrollPane sclNotes = new JScrollPane();
@@ -372,5 +373,21 @@ public class MainWindow {
 		tblProperties.setModel(table_model);
 		tblProperties.setAutoCreateRowSorter(true);
 		sclTable.setViewportView(tblProperties);
+	}
+	
+	/**
+	 * Event fired whenever the selection of the component tree view changes.
+	 * 
+	 * @param event Tree selection event.
+	 */
+	public void componentTreeValueChanged(TreeSelectionEvent event) {
+		Object node = event.getPath().getLastPathComponent();
+		
+		if (node instanceof ComponentTreeNode) {
+			// Node is a component.
+			this.setCurrentComponent(((ComponentTreeNode)node).getComponent());
+		} else {
+			this.clearComponentView();
+		}
 	}
 }

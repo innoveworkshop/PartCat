@@ -2,6 +2,8 @@ package com.innoveworkshop.partcat;
 
 import java.awt.EventQueue;
 
+import com.innoveworkshop.partcat.ui.MainWindow;
+
 /**
  * The main application class.
  *
