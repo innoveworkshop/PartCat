@@ -4,7 +4,9 @@ import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.util.HashMap;
 import java.util.ListIterator;
+import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -30,6 +32,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.table.DefaultTableModel;
 
 import com.innoveworkshop.partcat.components.Component;
+import com.innoveworkshop.partcat.components.ComponentProperties;
 import com.innoveworkshop.partcat.exceptions.ComponentNotFoundException;
 
 import javax.swing.tree.DefaultTreeModel;
@@ -134,6 +137,32 @@ public class MainWindow {
 		// Enable the buttons we have files for.
 		btnDatasheet.setEnabled(component.hasDatasheet());
 		btnModel.setEnabled(component.hasSPICEModel());
+		
+		// Populate the table with data.
+		this.setPropertiesTableContents(component.getProperties());
+	}
+	
+	/**
+	 * Clears the properties table.
+	 */
+	public void clearPropertiesTable() {
+		((DefaultTableModel)tblProperties.getModel()).setRowCount(0);
+	}
+	
+	/**
+	 * Sets the contents of the properties table using a HashMap of Strings.
+	 * 
+	 * @param map HashMap with strings to populate the table with.
+	 */
+	protected void setPropertiesTableContents(HashMap<String, String> map) {
+		// Get the table model and clear it.
+		DefaultTableModel model = (DefaultTableModel)tblProperties.getModel();
+		this.clearPropertiesTable();
+		
+		// Go through the HashMap.
+		for (Map.Entry<String, String> entry : map.entrySet()) {
+			model.addRow(new Object[] { entry.getKey(), entry.getValue() });
+		}
 	}
 	
 	/**
@@ -335,22 +364,13 @@ public class MainWindow {
 		sl_rightPanel.putConstraint(SpringLayout.EAST, sclTable, 0, SpringLayout.EAST, txtName);
 		rightPanel.add(sclTable);
 		
+		DefaultTableModel table_model = new DefaultTableModel(new Object[][] {},
+				new String[] { "Property", "Value" });
+		
 		tblProperties.setCellSelectionEnabled(true);
 		tblProperties.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		tblProperties.setModel(new DefaultTableModel(
-			new Object[][] {
-			},
-			new String[] {
-				"Key", "Value"
-			}
-		) {
-			Class[] columnTypes = new Class[] {
-				Object.class, String.class
-			};
-			public Class getColumnClass(int columnIndex) {
-				return columnTypes[columnIndex];
-			}
-		});
+		tblProperties.setModel(table_model);
+		tblProperties.setAutoCreateRowSorter(true);
 		sclTable.setViewportView(tblProperties);
 	}
 }
