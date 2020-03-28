@@ -20,7 +20,6 @@ public class MainApplication {
 	public static void main(String[] args) throws Exception {
 		// Open workspace.
 		workspace = new PartCatWorkspace("/home/nathan/partcat-test");
-		System.out.println("PartCat Workspace\n");
 		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {

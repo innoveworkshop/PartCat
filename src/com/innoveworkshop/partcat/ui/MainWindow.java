@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowEvent;
 import java.util.HashMap;
 import java.util.ListIterator;
 import java.util.Map;
@@ -37,6 +38,8 @@ import javax.swing.tree.DefaultTreeModel;
 
 import com.innoveworkshop.partcat.PartCatWorkspace;
 import com.innoveworkshop.partcat.components.Component;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 /**
  * Our main window class.
@@ -44,6 +47,7 @@ import com.innoveworkshop.partcat.components.Component;
  * @author Nathan Campos <nathan@innoveworkshop.com>
  */
 public class MainWindow {
+	private PartCatWorkspace workspace;
 	private Component current_component;
 	
 	private JFrame frmPartcat;
@@ -118,6 +122,12 @@ public class MainWindow {
 	 * @param component Component to be shown/edited.
 	 */
 	protected void showComponent(Component component) {
+		// Re-enable everything.
+		txtName.setEnabled(true);
+		spnQuantity.setEnabled(true);
+		txtNotes.setEnabled(true);
+		tblProperties.setEnabled(true);
+		
 		// Set text items.
 		txtName.setText(component.getName());
 		spnQuantity.setValue(Integer.valueOf(component.getQuantity()));
@@ -142,8 +152,11 @@ public class MainWindow {
 	protected void clearComponentView() {
 		// Text controls.
 		txtName.setText("");
+		txtName.setEnabled(false);
 		spnQuantity.setValue(Integer.valueOf(0));
+		spnQuantity.setEnabled(false);
 		txtNotes.setText("");
+		txtNotes.setEnabled(false);
 		
 		// Buttons.
 		btnDatasheet.setEnabled(false);
@@ -152,6 +165,7 @@ public class MainWindow {
 		
 		// Table.
 		this.clearPropertiesTable();
+		tblProperties.setEnabled(false);
 	}
 	
 	/**
@@ -193,6 +207,7 @@ public class MainWindow {
 	 * @param workspace Opened PartCat workspace.
 	 */
 	public void setWorkspace(PartCatWorkspace workspace) {
+		this.workspace = workspace;
 	}
 
 	/**
@@ -225,6 +240,12 @@ public class MainWindow {
 		menuBar.add(mnFile);
 		
 		JMenuItem mntmQuit = new JMenuItem("Quit");
+		mntmQuit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				frmPartcat.dispatchEvent(new WindowEvent(frmPartcat, 
+						WindowEvent.WINDOW_CLOSING));
+			}
+		});
 		mntmQuit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, InputEvent.CTRL_MASK));
 		mnFile.add(mntmQuit);
 		SpringLayout springLayout = new SpringLayout();
