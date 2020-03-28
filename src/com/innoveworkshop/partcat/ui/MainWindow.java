@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.awt.event.WindowEvent;
 import java.util.HashMap;
 import java.util.ListIterator;
 import java.util.Map;
@@ -40,6 +39,7 @@ import com.innoveworkshop.partcat.PartCatWorkspace;
 import com.innoveworkshop.partcat.components.Component;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import javax.swing.JSeparator;
 
 /**
  * Our main window class.
@@ -47,19 +47,20 @@ import java.awt.event.ActionEvent;
  * @author Nathan Campos <nathan@innoveworkshop.com>
  */
 public class MainWindow {
-	private PartCatWorkspace workspace;
-	private Component current_component;
+	public MainWindowActions action;
+	public PartCatWorkspace workspace;
+	public Component current_component;
 	
-	private JFrame frmPartcat;
-	private JTree treeComponents;
-	private JTextField txtSearch;
-	private JTextField txtName;
-	private JSpinner spnQuantity;
-	private JTextArea txtNotes;
-	private JTable tblProperties;
-	private JButton btnDatasheet;
-	private JButton btnModel;
-	private JButton btnExtras;
+	public JFrame frmPartcat;
+	public JTree treeComponents;
+	public JTextField txtSearch;
+	public JTextField txtName;
+	public JSpinner spnQuantity;
+	public JTextArea txtNotes;
+	public JTable tblProperties;
+	public JButton btnDatasheet;
+	public JButton btnModel;
+	public JButton btnExtras;
 
 	/**
 	 * Creates the main frame.
@@ -67,7 +68,8 @@ public class MainWindow {
 	 * @wbp.parser.constructor
 	 */
 	public MainWindow() {
-		current_component = null;
+		this.current_component = null;
+		this.action = new MainWindowActions(this);
 		
 		// Set the look and feel to be more native looking.
 		try {
@@ -98,12 +100,12 @@ public class MainWindow {
 	}
 	
 	/**
-	 * Sets the components tree view iterator. This will repopulate the control.
+	 * Populates the tree view using a components list iterator.
 	 * 
 	 * @param iter Components list iterator.
 	 * @see {@link Component.componentIterator()}
 	 */
-	public void setComponentsViewIterator(ListIterator<Component> iter) {
+	public void populateComponentsTree(ListIterator<Component> iter) {
 		// Create the tree root node.
 		DefaultMutableTreeNode root = new DefaultMutableTreeNode("Components");
 		
@@ -227,6 +229,7 @@ public class MainWindow {
 	/**
 	 * Initialize the contents of the frame.
 	 */
+	@SuppressWarnings("deprecation")
 	private void initializeUIControls() {
 		frmPartcat = new JFrame();
 		frmPartcat.setTitle("PartCat");
@@ -242,12 +245,61 @@ public class MainWindow {
 		JMenuItem mntmQuit = new JMenuItem("Quit");
 		mntmQuit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				frmPartcat.dispatchEvent(new WindowEvent(frmPartcat, 
-						WindowEvent.WINDOW_CLOSING));
+				action.closeWindow();
 			}
 		});
+		
+		JMenuItem mntmNewComponent = new JMenuItem("New Component");
+		mntmNewComponent.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_MASK));
+		mnFile.add(mntmNewComponent);
+		
+		JMenuItem mntmSave = new JMenuItem("Save");
+		mntmSave.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK));
+		mnFile.add(mntmSave);
+		
+		JMenuItem mntmSaveAs = new JMenuItem("Save As...");
+		mnFile.add(mntmSaveAs);
+		
+		JSeparator separator = new JSeparator();
+		mnFile.add(separator);
+		
+		JMenuItem mntmOpenWorkspace = new JMenuItem("Open Workspace...");
+		mntmOpenWorkspace.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				action.openWorkspace();
+			}
+		});
+		mntmOpenWorkspace.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_MASK));
+		mnFile.add(mntmOpenWorkspace);
+		
+		JMenuItem mntmRefreshWorkspace = new JMenuItem("Refresh Workspace");
+		mntmRefreshWorkspace.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				action.refreshWorkspace();
+			}
+		});
+		mntmRefreshWorkspace.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_MASK));
+		mnFile.add(mntmRefreshWorkspace);
+		
+		JMenuItem mntmCloseWorkspace = new JMenuItem("Close Workspace");
+		mntmCloseWorkspace.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				action.closeWorkspace();
+			}
+		});
+		mntmCloseWorkspace.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.CTRL_MASK));
+		mnFile.add(mntmCloseWorkspace);
+		
+		JSeparator separator_1 = new JSeparator();
+		mnFile.add(separator_1);
 		mntmQuit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, InputEvent.CTRL_MASK));
 		mnFile.add(mntmQuit);
+		
+		JMenu mnHelp = new JMenu("Help");
+		menuBar.add(mnHelp);
+		
+		JMenuItem mntmAbout = new JMenuItem("About...");
+		mnHelp.add(mntmAbout);
 		SpringLayout springLayout = new SpringLayout();
 		frmPartcat.getContentPane().setLayout(springLayout);
 		

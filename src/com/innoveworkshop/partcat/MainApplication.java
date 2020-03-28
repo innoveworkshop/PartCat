@@ -26,7 +26,7 @@ public class MainApplication {
 				try {
 					MainWindow window = new MainWindow(workspace);
 					window.show();
-					window.setComponentsViewIterator(workspace.componentIterator());
+					window.populateComponentsTree(workspace.componentIterator());
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

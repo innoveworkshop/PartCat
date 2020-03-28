@@ -42,8 +42,7 @@ public class PartCatWorkspace {
 	 */
 	public PartCatWorkspace(Path path) throws WorkspaceNotFoundException {
 		this();
-		this.setPath(path);
-		this.populateComponents();
+		this.open(path);
 	}
 	
 	/**
@@ -57,6 +56,29 @@ public class PartCatWorkspace {
 	 */
 	public PartCatWorkspace(String path) throws WorkspaceNotFoundException {
 		this(Paths.get(path));
+	}
+	
+	/**
+	 * Opens a workspace from a given path.
+	 * 
+	 * @param path Path to the root of a PartCat workspace folder as a
+	 *             {@link Path}.
+	 *             
+	 * @throws WorkspaceNotFoundException If the specified path wasn't found or
+	 *                                    isn't a directory.
+	 */
+	public void open(Path path) throws WorkspaceNotFoundException {
+		this.setPath(path);
+		this.populateComponents();
+	}
+	
+	/**
+	 * Closes the workspace.
+	 */
+	public void close() {
+		root_path = null;
+		opened = false;
+		components.clear();
 	}
 	
 	/**
