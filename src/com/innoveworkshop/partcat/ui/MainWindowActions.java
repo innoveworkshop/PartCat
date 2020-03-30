@@ -1,12 +1,13 @@
 package com.innoveworkshop.partcat.ui;
 
 import java.awt.event.WindowEvent;
+import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import javax.swing.JFileChooser;
 
 import com.innoveworkshop.partcat.PartCatWorkspace;
+import com.innoveworkshop.partcat.components.Component;
 import com.innoveworkshop.partcat.exceptions.WorkspaceNotFoundException;
 
 /**
@@ -24,6 +25,21 @@ public class MainWindowActions {
 	 */
 	public MainWindowActions(MainWindow parent) {
 		this.window = parent;
+	}
+	
+	/**
+	 * Saves a component to disk.
+	 * 
+	 * @param component Component to be saved.
+	 */
+	public void saveComponent(Component component) {
+		try {
+			window.syncComponentChanges();
+			component.save();
+		} catch (IOException e) {
+			// TODO: Show error dialog.
+			e.printStackTrace();
+		}
 	}
 	
 	/**
@@ -68,6 +84,7 @@ public class MainWindowActions {
 			this.closeWorkspace();
 			this.openWorkspace(new PartCatWorkspace(path));
 		} catch (WorkspaceNotFoundException e) {
+			// TODO: Show error dialog.
 			e.printStackTrace();
 		}
 	}

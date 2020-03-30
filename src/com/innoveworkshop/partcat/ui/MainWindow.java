@@ -37,6 +37,8 @@ import javax.swing.tree.DefaultTreeModel;
 
 import com.innoveworkshop.partcat.PartCatWorkspace;
 import com.innoveworkshop.partcat.components.Component;
+import com.innoveworkshop.partcat.components.ComponentProperties;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.JSeparator;
@@ -119,13 +121,29 @@ public class MainWindow {
 	}
 	
 	/**
+	 * Syncs the component changes in the UI to the component object.
+	 */
+	public void syncComponentChanges() {
+		current_component.setQuantity((Integer)spnQuantity.getValue());
+		current_component.setNotes(txtNotes.getText());
+		
+		// Properties.
+		DefaultTableModel model = (DefaultTableModel)tblProperties.getModel();
+		ComponentProperties prop = current_component.getProperties();
+		prop.clear();
+		for (int row = 0; row < model.getRowCount(); row++) {
+			prop.put((String)model.getValueAt(row, 0), (String)model.getValueAt(row, 1));
+		}
+	}
+	
+	/**
 	 * Populates the view/edit area with data from a given component.
 	 * 
 	 * @param component Component to be shown/edited.
 	 */
 	protected void showComponent(Component component) {
 		// Re-enable everything.
-		txtName.setEnabled(true);
+		txtName.setEnabled(false);
 		spnQuantity.setEnabled(true);
 		txtNotes.setEnabled(true);
 		tblProperties.setEnabled(true);
@@ -254,6 +272,11 @@ public class MainWindow {
 		mnFile.add(mntmNewComponent);
 		
 		JMenuItem mntmSave = new JMenuItem("Save");
+		mntmSave.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				action.saveComponent(current_component);
+			}
+		});
 		mntmSave.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK));
 		mnFile.add(mntmSave);
 		

@@ -1,11 +1,15 @@
 package com.innoveworkshop.partcat.components;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.innoveworkshop.utilities.FileUtilities;
 
 /**
  * A collection of properties related to a {@link Component}.
@@ -24,12 +28,12 @@ public class ComponentProperties extends HashMap<String, String> {
 	/**
 	 * Populates the properties with data from a manifest file.
 	 * 
-	 * @param manifest_path Manifest file path.
+	 * @param manifestPath Manifest file path.
 	 * 
 	 * @throws FileNotFoundException If the manifest file doesn't exist.
 	 */
-	public void parseManifest(Path manifest_path) throws FileNotFoundException {
-		Scanner input = new Scanner(manifest_path.toFile());
+	public void parseManifest(Path manifestPath) throws FileNotFoundException {
+		Scanner input = new Scanner(manifestPath.toFile());
 		Pattern pattern = Pattern.compile("^([A-Za-z0-9\\-]+): (.+)$");
 		
 		// Read manifest line-by-line.
@@ -48,5 +52,26 @@ public class ComponentProperties extends HashMap<String, String> {
 				System.err.println("Invalid manifest line: " + line);
 			}
 		}
+	}
+	
+	/**
+	 * Saves the component properties as a manifest file.
+	 * 
+	 * @param manifestPath Manifest file path.
+	 * 
+	 * @throws IOException If something goes wrong when saving the file.
+	 */
+	public void saveManifest(Path manifestPath) throws IOException {
+		// Build manifest file contents string.
+		StringBuilder strBuilder = new StringBuilder();
+		for (Map.Entry<String, String> entry : this.entrySet()) {
+			strBuilder.append(entry.getKey());
+			strBuilder.append(": ");
+			strBuilder.append(entry.getValue());
+			strBuilder.append("\n");
+		}
+		
+		// Save contents to file.
+		FileUtilities.writeFileContents(manifestPath, strBuilder.toString());
 	}
 }

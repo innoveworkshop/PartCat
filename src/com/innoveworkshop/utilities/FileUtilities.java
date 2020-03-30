@@ -3,6 +3,7 @@ package com.innoveworkshop.utilities;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 
@@ -34,5 +35,25 @@ public class FileUtilities {
 		
 		// Set the notes property.
 		return new String(data, "UTF-8");
+	}
+	
+	/**
+	 * Overrides the contents of a file. This function will create the file if
+	 * it doesn't exist.
+	 * 
+	 * @param path     Path to the file to be written.
+	 * @param contents Contents to be written to the file.
+	 * 
+	 * @throws IOException If something goes wrong.
+	 */
+	public static void writeFileContents(Path path, String contents) throws IOException {
+		// Open file and create if it doesn't exist.
+		File file = new File(path.toString());
+		file.createNewFile();  // Just making sure.
+		
+		// Write contents to the file.
+		FileOutputStream outStream = new FileOutputStream(file);
+		outStream.write(contents.getBytes());
+		outStream.close();
 	}
 }

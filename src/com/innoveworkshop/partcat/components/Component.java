@@ -123,6 +123,25 @@ public class Component {
 	}
 	
 	/**
+	 * Saves the component to disk. This will override all the files inside the
+	 * component folder.
+	 * 
+	 * @throws IOException When something wrong happens.
+	 */
+	public void save() throws IOException {
+		// Quantity file.
+		FileUtilities.writeFileContents(path.resolve(PartCatConstants.QUANTITY_FILE),
+				String.valueOf(this.getQuantity()));
+		
+		// Notes file.
+		FileUtilities.writeFileContents(path.resolve(PartCatConstants.NOTES_FILE),
+				this.getNotes());
+		
+		// Properties file.
+		prop.saveManifest(path.resolve(PartCatConstants.MANIFEST_FILE));
+	}
+	
+	/**
 	 * Checks if a component exists by its name.
 	 * 
 	 * @param  name      Component name to search for.
