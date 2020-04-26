@@ -93,8 +93,7 @@ public class MainWindowActions {
 	 * Closes the currently opened workspace.
 	 */
 	public void closeWorkspace() {
-		window.treeComponents.setModel(null);
-		window.clearComponentView();
+		window.clearComponentTreeAndView();
 		window.workspace.close();
 	}
 	

@@ -16,6 +16,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
@@ -37,6 +38,7 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 
 import com.innoveworkshop.partcat.PartCatWorkspace;
 import com.innoveworkshop.partcat.components.Component;
@@ -116,7 +118,11 @@ public class MainWindow {
 		
 		// Go through components adding them to the tree.
 		while (iter.hasNext()) {
-			root.add(new ComponentTreeNode(iter.next()));
+			Component comp = iter.next();
+			
+			// Check if the component has been deleted before adding it.
+			if (!comp.isDeleted())
+				root.add(new ComponentTreeNode(comp));
 		}
 		
 		// Set the tree model.
@@ -212,6 +218,14 @@ public class MainWindow {
 		for (Map.Entry<String, String> entry : map.entrySet()) {
 			model.addRow(new Object[] { entry.getKey(), entry.getValue() });
 		}
+	}
+	
+	/**
+	 * Clears all the content from the component tree and its view.
+	 */
+	public void clearComponentTreeAndView() {
+		treeComponents.setModel(null);
+		clearComponentView();
 	}
 	
 	/**
@@ -352,6 +366,7 @@ public class MainWindow {
 		leftPanel.add(sclTree);
 		
 		treeComponents = new JTree();
+		treeComponents.addMouseListener(new ComponentMousePopupListener(treeComponents));
 		treeComponents.addTreeSelectionListener(new TreeSelectionListener() {
 			public void valueChanged(TreeSelectionEvent event) {
 				componentTreeValueChanged(event);
@@ -533,7 +548,11 @@ public class MainWindow {
 				menuItem = new JMenuItem("Remove");
 				menuItem.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						removeTableRow();
+						int option = JOptionPane.showConfirmDialog(frmPartcat,
+								"Are you sure you want to delete this row?");
+						
+						if (option == JOptionPane.YES_OPTION)
+							removeTableRow();
 					}
 				});
 				popupMenu.add(menuItem);
@@ -577,6 +596,103 @@ public class MainWindow {
 		public void removeTableRow() {
 			DefaultTableModel model = (DefaultTableModel)tblTable.getModel();
 			model.removeRow(row);
+		}
+	}
+	
+	/**
+	 * A mouse adapter class to handle the component list popup menu.
+	 */
+	class ComponentMousePopupListener extends MouseAdapter {
+		public JTree treeView;
+		public JPopupMenu popupMenu;
+		public JMenuItem mitmDelete;
+		public Component selComponent;
+		
+		/**
+		 * Creates the popup menu for the component list.
+		 * 
+		 * @param treeView Components tree view.
+		 */
+		public ComponentMousePopupListener(JTree treeView) {
+			// Set the current state of things.
+			this.treeView = treeView;
+			popupMenu = new JPopupMenu();
+			selComponent = null;
+			
+			// New component item.
+			JMenuItem menuItem = new JMenuItem("New");
+			menuItem.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					// TODO: Call the new component action.
+				}
+			});
+			popupMenu.add(menuItem);
+			
+			// Delete component item.
+			mitmDelete = new JMenuItem("Delete");
+			mitmDelete.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					int option = JOptionPane.showConfirmDialog(frmPartcat,
+							"Are you sure you want to delete " + selComponent.getName() + "?");
+					
+					if (option == JOptionPane.YES_OPTION) {
+						selComponent.delete();
+						
+						// Clear everything and reload the tree view.
+						clearComponentTreeAndView();
+						populateComponentsTree(workspace.componentIterator());
+					}
+				}
+			});
+			popupMenu.add(mitmDelete);
+		}
+		
+		@Override
+		public void mousePressed(MouseEvent e) {
+			if (e.isPopupTrigger()) {
+				enableDeleteMenu(getComponentFromPosition(e.getX(), e.getY()));
+				popupMenu.show(e.getComponent(), e.getX(), e.getY());
+			}
+		}
+		
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			if (e.isPopupTrigger()) {
+				enableDeleteMenu(getComponentFromPosition(e.getX(), e.getY()));
+				popupMenu.show(e.getComponent(), e.getX(), e.getY());
+			}
+		}
+		
+		/**
+		 * Retrieves the component object from a tree view by using the mouse
+		 * position.
+		 * 
+		 * @param  x Mouse X position.
+		 * @param  y Mouse Y position.
+		 * @return   True if we are hovering a component.
+		 */
+		public boolean getComponentFromPosition(int x, int y) {
+			TreePath treePath = treeView.getPathForLocation(x, y);
+			if (treePath == null)
+				return false;
+			
+			Object node = treePath.getLastPathComponent();
+			if (node instanceof ComponentTreeNode) {
+				selComponent = ((ComponentTreeNode)node).getComponent();
+				return true;
+			}
+			
+			selComponent = null;
+			return false;
+		}
+		
+		/**
+		 * Manages if we should enable or disable the delete item.
+		 * 
+		 * @param enable Should we enable the menu item?
+		 */
+		private void enableDeleteMenu(boolean enable) {
+			mitmDelete.setEnabled(enable);
 		}
 	}
 }

@@ -25,6 +25,7 @@ public class Component {
 	private ComponentProperties prop;
 	private String notes;
 	private boolean newly_created;
+	private boolean deleted;
 
 	/**
 	 * Creates an empty component object.
@@ -48,6 +49,7 @@ public class Component {
 		this.setNotes(null);
 		this.prop = new ComponentProperties();
 		this.newly_created = true;
+		this.deleted = false;
 	}
 	
 	/**
@@ -142,6 +144,17 @@ public class Component {
 	}
 	
 	/**
+	 * Deletes the whole component folder.
+	 */
+	public void delete() {
+		// TODO: Implement component nuke.
+		System.out.println("===== DELETING THIS COMPONENT... =====");
+		System.out.println(this.toString());
+		System.out.println("===== DELETING THIS COMPONENT... =====");
+		deleted = true;
+	}
+	
+	/**
 	 * Checks if a component exists by its name.
 	 * 
 	 * @param  name      Component name to search for.
@@ -159,6 +172,7 @@ public class Component {
 	 * @return           True if the component folder exists.
 	 */
 	public static boolean exists(PartCatWorkspace workspace, String name) {
+		// TODO: Implement the component existence checking.
 		return true;
 	}
 	
@@ -287,6 +301,15 @@ public class Component {
 	 */
 	public boolean isNewlyCreated() {
 		return this.newly_created;
+	}
+	
+	/**
+	 * Checks is a component is in a deleted state.
+	 * 
+	 * @return True if the component is in a deleted state.
+	 */
+	public boolean isDeleted() {
+		return this.deleted;
 	}
 
 	/**
