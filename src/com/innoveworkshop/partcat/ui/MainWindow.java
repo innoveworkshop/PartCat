@@ -6,6 +6,7 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.ListIterator;
 import java.util.Map;
@@ -288,7 +289,11 @@ public class MainWindow {
 		});
 		
 		JMenuItem mntmNewComponent = new JMenuItem("New Component");
-		mntmNewComponent.setEnabled(false);
+		mntmNewComponent.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				action.newComponent();
+			}
+		});
 		mntmNewComponent.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_MASK));
 		mnFile.add(mntmNewComponent);
 		
@@ -372,6 +377,7 @@ public class MainWindow {
 		treeComponents.addMouseListener(new ComponentMousePopupListener(treeComponents));
 		treeComponents.addTreeSelectionListener(new TreeSelectionListener() {
 			public void valueChanged(TreeSelectionEvent event) {
+				// TODO: Check if there are unsaved changes.
 				componentTreeValueChanged(event);
 			}
 		});
@@ -639,12 +645,19 @@ public class MainWindow {
 			mitmDelete.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					int option = JOptionPane.showConfirmDialog(frmPartcat,
-							"Are you sure you want to delete " + selComponent.getName() + "?",
+							"Are you sure you want to delete " +selComponent.getName() + "?",
 							"Delete Component", JOptionPane.YES_NO_OPTION,
 							JOptionPane.WARNING_MESSAGE);
 					
 					if (option == JOptionPane.YES_OPTION) {
-						selComponent.delete();
+						try {
+							selComponent.delete();
+						} catch (IOException e1) {
+							e1.printStackTrace();
+							JOptionPane.showMessageDialog(frmPartcat,
+									"Something went wrong while trying to delete " + selComponent.getName(),
+									"Deletion Error", JOptionPane.ERROR_MESSAGE);
+						}
 						
 						// Clear everything and reload the tree view.
 						clearComponentTreeAndView();

@@ -56,4 +56,22 @@ public class FileUtilities {
 		outStream.write(contents.getBytes());
 		outStream.close();
 	}
+	
+	/**
+	 * Deletes a whole directory recursively.
+	 * 
+	 * @param  path Path to the directory to be deleted.
+	 * @return      True if the directory was deleted successfully.
+	 */
+	public static boolean deleteDirectory(File path) {
+		File[] contents = path.listFiles();
+		
+		if (contents != null) {
+			for (File file : contents) {
+				deleteDirectory(file);
+			}
+		}
+		
+		return path.delete();
+	}
 }

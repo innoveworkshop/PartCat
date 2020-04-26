@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 
 import com.innoveworkshop.partcat.PartCatWorkspace;
 import com.innoveworkshop.partcat.components.Component;
@@ -39,6 +40,36 @@ public class MainWindowActions {
 		} catch (IOException e) {
 			// TODO: Show error dialog.
 			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Creates a new component from scratch.
+	 */
+	public void newComponent() {
+		String name = JOptionPane.showInputDialog(window.frmPartcat,
+				"Enter the new component name:", "New Component",
+				JOptionPane.PLAIN_MESSAGE);
+		
+		// Check if the user hit the cancel button.
+		if (name == null)
+			return;
+		
+		// Check if the entered name is empty.
+		if (!name.isEmpty()) {
+			// TODO: Check if the name already exists and fail if so.
+	
+			try {
+				// Create and save the new component.
+				Component component = new Component(window.workspace);
+				component.setName(name);
+				component.save();
+				
+				// Refresh the workspace.
+				refreshWorkspace();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	

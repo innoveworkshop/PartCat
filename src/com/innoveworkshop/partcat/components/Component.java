@@ -131,13 +131,26 @@ public class Component {
 	 * @throws IOException When something wrong happens.
 	 */
 	public void save() throws IOException {
+		// Check if we are dealing with a new component. If so, create it first.
+		if (isNewlyCreated()) {
+			// Get path to the new component.
+			path = workspace.getPath()
+					.resolve(PartCatConstants.COMPONENTS_ROOT).resolve(name);
+			
+			// Create component folder.
+			if (!path.toFile().mkdir())
+				throw new IOException("Couldn't create the component folder at " +
+						path.toString());
+		}
+		
 		// Quantity file.
 		FileUtilities.writeFileContents(path.resolve(PartCatConstants.QUANTITY_FILE),
 				String.valueOf(this.getQuantity()));
 		
 		// Notes file.
-		FileUtilities.writeFileContents(path.resolve(PartCatConstants.NOTES_FILE),
-				this.getNotes());
+		if (this.getNotes() != null)
+			FileUtilities.writeFileContents(path.resolve(PartCatConstants.NOTES_FILE),
+					this.getNotes());
 		
 		// Properties file.
 		prop.saveManifest(path.resolve(PartCatConstants.MANIFEST_FILE));
@@ -145,13 +158,13 @@ public class Component {
 	
 	/**
 	 * Deletes the whole component folder.
+	 * 
+	 * @throws IOException If there's any issues while deleting the directory.
 	 */
-	public void delete() {
-		// TODO: Implement component nuke.
-		System.out.println("===== DELETING THIS COMPONENT... =====");
-		System.out.println(this.toString());
-		System.out.println("===== DELETING THIS COMPONENT... =====");
+	public void delete() throws IOException {
 		deleted = true;
+		if (!FileUtilities.deleteDirectory(path.toFile()))
+			throw new IOException("Something went wrong while deleting " + getName());
 	}
 	
 	/**
