@@ -29,6 +29,27 @@ public class MainWindowActions {
 	}
 	
 	/**
+	 * Shows an open file chooser and updates the image asset of a component
+	 * object accordingly.
+	 * 
+	 * @param component Component to have its image changed.
+	 */
+	public void selectComponentImage(Component component) {
+		// Setup the file chooser.
+		JFileChooser dialog = new JFileChooser();
+		dialog.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		dialog.setDialogTitle("Select Component Image");
+		dialog.setCurrentDirectory(window.workspace.getImagesPath().toFile());
+		
+		// Show the dialog and handle the open operation only if approved.
+		if (dialog.showOpenDialog(window.frmPartcat) == JFileChooser.APPROVE_OPTION) {
+			// TODO: Make it so that if the selected image is outside the images directory we'll copy the image to it.
+			component.setImage(dialog.getSelectedFile().getName());
+			window.setUnsavedChanges(true);
+		}
+	}
+	
+	/**
 	 * Saves a component to disk.
 	 * 
 	 * @param component Component to be saved.
@@ -141,9 +162,9 @@ public class MainWindowActions {
 	 * Closes the currently opened workspace.
 	 */
 	public void closeWorkspace() {
+		window.setUnsavedChanges(false);
 		window.clearComponentTreeAndView();
 		window.workspace.close();
-		window.setUnsavedChanges(false);
 	}
 	
 	/**

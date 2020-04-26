@@ -109,7 +109,16 @@ public class PartCatWorkspace {
 	 * @return Path to the workspace as a {@link Path}.
 	 */
 	public Path getPath() {
-		return this.root_path;
+		return root_path;
+	}
+	
+	/**
+	 * Gets the path to the images directory of the workspace.
+	 * 
+	 * @return Images directory path.
+	 */
+	public Path getImagesPath() {
+		return root_path.resolve(PartCatConstants.ASSETS_ROOT).resolve(PartCatConstants.IMAGES_DIR);
 	}
 	
 	/**
@@ -126,8 +135,8 @@ public class PartCatWorkspace {
 		if (!Files.exists(path) && !Files.isDirectory(path))
 			 throw new WorkspaceNotFoundException(path.toString());
 		
-		this.root_path = path;
-		this.opened = true;
+		root_path = path;
+		opened = true;
 	}
 	
 	/**
@@ -156,7 +165,7 @@ public class PartCatWorkspace {
 	 * @return Component list iterator.
 	 */
 	public ListIterator<Component> componentIterator() {
-		return this.components.listIterator();
+		return components.listIterator();
 	}
 	
 	/**
@@ -165,6 +174,6 @@ public class PartCatWorkspace {
 	 * @return True if the workspace is opened.
 	 */
 	public boolean isOpen() {
-		return this.opened;
+		return opened;
 	}
 }

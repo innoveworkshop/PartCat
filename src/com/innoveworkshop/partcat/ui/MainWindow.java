@@ -334,6 +334,7 @@ public class MainWindow {
 				if (handleUnsavedChanges())
 					return;
 				
+				action.closeWorkspace();
 				frmPartcat.dispose();
 			}
 		});
@@ -487,6 +488,14 @@ public class MainWindow {
 		rightPanel.setLayout(sl_rightPanel);
 		
 		JLabel lblImage = new JLabel("Image");
+		lblImage.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() == 2) {
+					action.selectComponentImage(current_component);
+				}
+			}
+		});
 		lblImage.setBackground(Color.GRAY);
 		sl_rightPanel.putConstraint(SpringLayout.NORTH, lblImage, 5, SpringLayout.NORTH, rightPanel);
 		sl_rightPanel.putConstraint(SpringLayout.WEST, lblImage, 5, SpringLayout.WEST, rightPanel);

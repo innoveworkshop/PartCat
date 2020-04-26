@@ -16,4 +16,7 @@ public final class PartCatConstants {
 	// Root paths.
 	public static final String COMPONENTS_ROOT  = "components";
 	public static final String ASSETS_ROOT   = "assets";
+	
+	// Sub folders paths.
+	public static final String IMAGES_DIR = "images";
 }
