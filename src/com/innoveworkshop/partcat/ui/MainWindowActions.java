@@ -37,6 +37,7 @@ public class MainWindowActions {
 		try {
 			window.syncComponentChanges();
 			component.save();
+			window.setUnsavedChanges(false);
 		} catch (IOException e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(window.frmPartcat,
@@ -75,6 +76,7 @@ public class MainWindowActions {
 				
 				// Refresh the workspace.
 				refreshWorkspace();
+				window.setUnsavedChanges(false);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -102,6 +104,8 @@ public class MainWindowActions {
 						"Not a Workspace", JOptionPane.ERROR_MESSAGE);
 			}
 		}
+		
+		window.setUnsavedChanges(false);
 	}
 	
 	/**
@@ -113,6 +117,7 @@ public class MainWindowActions {
 		this.closeWorkspace();
 		window.setWorkspace(workspace);
 		window.populateComponentsTree(workspace.componentIterator());
+		window.setUnsavedChanges(false);
 	}
 	
 	/**
@@ -138,6 +143,7 @@ public class MainWindowActions {
 	public void closeWorkspace() {
 		window.clearComponentTreeAndView();
 		window.workspace.close();
+		window.setUnsavedChanges(false);
 	}
 	
 	/**

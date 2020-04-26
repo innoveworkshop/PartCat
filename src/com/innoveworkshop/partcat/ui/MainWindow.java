@@ -6,12 +6,15 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.ListIterator;
 import java.util.Map;
 
 import javax.swing.JButton;
+import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -34,9 +37,14 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.SpringLayout;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.text.DefaultFormatter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
@@ -55,6 +63,8 @@ import javax.swing.JSeparator;
  * @author Nathan Campos <nathan@innoveworkshop.com>
  */
 public class MainWindow {
+	private boolean unsavedChanges;
+	
 	public MainWindowActions action;
 	public PartCatWorkspace workspace;
 	public Component current_component;
@@ -93,8 +103,9 @@ public class MainWindow {
 		}
 		
 		// Initialize the UI controls.
-		this.initializeUIControls();
-		this.clearComponentView();
+		initializeUIControls();
+		clearComponentView();
+		setUnsavedChanges(false);
 	}
 
 	/**
@@ -104,7 +115,7 @@ public class MainWindow {
 	 */
 	public MainWindow(PartCatWorkspace workspace) {
 		this();
-		this.setWorkspace(workspace);
+		setWorkspace(workspace);
 	}
 	
 	/**
@@ -174,6 +185,9 @@ public class MainWindow {
 		
 		// Populate the table with data.
 		this.setPropertiesTableContents(component.getProperties());
+		
+		// Clear dirtyness.
+		setUnsavedChanges(false);
 	}
 	
 	/**
@@ -199,6 +213,7 @@ public class MainWindow {
 		
 		// Component.
 		current_component = null;
+		setUnsavedChanges(false);
 	}
 	
 	/**
@@ -239,7 +254,9 @@ public class MainWindow {
 	 */
 	public void setCurrentComponent(Component component) {
 		current_component = component;
-		this.showComponent(current_component);
+		
+		showComponent(current_component);
+		setUnsavedChanges(false);
 	}
 	
 	/**
@@ -249,6 +266,43 @@ public class MainWindow {
 	 */
 	public void setWorkspace(PartCatWorkspace workspace) {
 		this.workspace = workspace;
+	}
+	
+	/**
+	 * Takes care of showing a dialog for unsaved changes and what should be
+	 * done with the user decision.
+	 * 
+	 * @return True if the operation should be aborted because the user wants to
+	 *         save stuff first.
+	 */
+	public boolean handleUnsavedChanges() {
+		if (!hasUnsavedChanges())
+			return false;
+		
+		int option = JOptionPane.showConfirmDialog(frmPartcat,
+				"You have unsaved changes. Do you wish to continue and DISCARD them?",
+				"Unsaved Changes", JOptionPane.YES_NO_CANCEL_OPTION,
+				JOptionPane.WARNING_MESSAGE);
+		
+		return option != JOptionPane.YES_OPTION;
+	}
+	
+	/**
+	 * Checks if we have unsaved changes pending saving.
+	 * 
+	 * @return True if we do have unsaved changes to commit.
+	 */
+	public boolean hasUnsavedChanges() {
+		return this.unsavedChanges;
+	}
+	
+	/**
+	 * Sets the unsaved changes flag.
+	 * 
+	 * @param dirty Do we have unsaved changes?
+	 */
+	public void setUnsavedChanges(boolean dirty) {
+		this.unsavedChanges = dirty;
 	}
 
 	/**
@@ -273,7 +327,16 @@ public class MainWindow {
 		frmPartcat = new JFrame();
 		frmPartcat.setTitle("PartCat");
 		frmPartcat.setBounds(100, 100, 645, 384);
-		frmPartcat.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frmPartcat.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		frmPartcat.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent windowEvent) {
+				if (handleUnsavedChanges())
+					return;
+				
+				frmPartcat.dispose();
+			}
+		});
 		
 		JMenuBar menuBar = new JMenuBar();
 		frmPartcat.setJMenuBar(menuBar);
@@ -284,6 +347,9 @@ public class MainWindow {
 		JMenuItem mntmQuit = new JMenuItem("Quit");
 		mntmQuit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if (handleUnsavedChanges())
+					return;
+				
 				action.closeWindow();
 			}
 		});
@@ -291,6 +357,9 @@ public class MainWindow {
 		JMenuItem mntmNewComponent = new JMenuItem("New Component");
 		mntmNewComponent.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if (handleUnsavedChanges())
+					return;
+				
 				action.newComponent();
 			}
 		});
@@ -316,6 +385,9 @@ public class MainWindow {
 		JMenuItem mntmOpenWorkspace = new JMenuItem("Open Workspace...");
 		mntmOpenWorkspace.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if (handleUnsavedChanges())
+					return;
+				
 				action.openWorkspace();
 			}
 		});
@@ -325,6 +397,9 @@ public class MainWindow {
 		JMenuItem mntmRefreshWorkspace = new JMenuItem("Refresh Workspace");
 		mntmRefreshWorkspace.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if (handleUnsavedChanges())
+					return;
+				
 				action.refreshWorkspace();
 			}
 		});
@@ -334,6 +409,9 @@ public class MainWindow {
 		JMenuItem mntmCloseWorkspace = new JMenuItem("Close Workspace");
 		mntmCloseWorkspace.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if (handleUnsavedChanges())
+					return;
+				
 				action.closeWorkspace();
 			}
 		});
@@ -377,7 +455,9 @@ public class MainWindow {
 		treeComponents.addMouseListener(new ComponentMousePopupListener(treeComponents));
 		treeComponents.addTreeSelectionListener(new TreeSelectionListener() {
 			public void valueChanged(TreeSelectionEvent event) {
-				// TODO: Check if there are unsaved changes.
+				if (handleUnsavedChanges())
+					return;
+				
 				componentTreeValueChanged(event);
 			}
 		});
@@ -428,6 +508,19 @@ public class MainWindow {
 		txtName.setEnabled(false);
 		rightPanel.add(txtName);
 		txtName.setColumns(10);
+		txtName.getDocument().addDocumentListener(new DocumentListener() {
+			public void changedUpdate(DocumentEvent e) {
+				setUnsavedChanges(true);
+			}
+
+			public void insertUpdate(DocumentEvent e) {
+				setUnsavedChanges(true);
+			}
+
+			public void removeUpdate(DocumentEvent e) {
+				setUnsavedChanges(true);
+			}
+		});
 		
 		JLabel lblQuantity = new JLabel("Quantity");
 		sl_rightPanel.putConstraint(SpringLayout.NORTH, lblQuantity, 4, SpringLayout.SOUTH, lblName);
@@ -441,6 +534,15 @@ public class MainWindow {
 		sl_rightPanel.putConstraint(SpringLayout.SOUTH, lblQuantity, 0, SpringLayout.SOUTH, spnQuantity);
 		sl_rightPanel.putConstraint(SpringLayout.EAST, spnQuantity, -5, SpringLayout.EAST, rightPanel);
 		rightPanel.add(spnQuantity);
+		spnQuantity.getEditor().getComponent(0);
+		JFormattedTextField qntField = (JFormattedTextField)spnQuantity.getEditor().getComponent(0);
+		DefaultFormatter qntFormatter = (DefaultFormatter)qntField.getFormatter();
+	    qntFormatter.setCommitsOnValidEdit(true);
+		spnQuantity.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				setUnsavedChanges(true);
+			}
+		});
 		
 		JPanel extrasPanel = new JPanel();
 		sl_rightPanel.putConstraint(SpringLayout.WEST, extrasPanel, 0, SpringLayout.EAST, lblImage);
@@ -483,6 +585,19 @@ public class MainWindow {
 		sl_rightPanel.putConstraint(SpringLayout.SOUTH, txtNotes, -4, SpringLayout.NORTH, extrasPanel);
 		sl_rightPanel.putConstraint(SpringLayout.EAST, txtNotes, 0, SpringLayout.EAST, txtName);
 		sclNotes.setViewportView(txtNotes);
+		txtNotes.getDocument().addDocumentListener(new DocumentListener() {
+			public void changedUpdate(DocumentEvent e) {
+				setUnsavedChanges(true);
+			}
+
+			public void insertUpdate(DocumentEvent e) {
+				setUnsavedChanges(true);
+			}
+
+			public void removeUpdate(DocumentEvent e) {
+				setUnsavedChanges(true);
+			}
+		});
 		
 		JScrollPane sclTable = new JScrollPane();
 		sl_rightPanel.putConstraint(SpringLayout.NORTH, sclTable, 8, SpringLayout.SOUTH, lblImage);
@@ -513,9 +628,9 @@ public class MainWindow {
 		
 		if (node instanceof ComponentTreeNode) {
 			// Node is a component.
-			this.setCurrentComponent(((ComponentTreeNode)node).getComponent());
+			setCurrentComponent(((ComponentTreeNode)node).getComponent());
 		} else {
-			this.clearComponentView();
+			clearComponentView();
 		}
 	}
 	
@@ -600,6 +715,7 @@ public class MainWindow {
 		public void addTableRow() {
 			DefaultTableModel model = (DefaultTableModel)tblTable.getModel();
 			model.addRow(new Object[] { "", "" });
+			setUnsavedChanges(true);
 		}
 		
 		/**
@@ -608,6 +724,7 @@ public class MainWindow {
 		public void removeTableRow() {
 			DefaultTableModel model = (DefaultTableModel)tblTable.getModel();
 			model.removeRow(row);
+			setUnsavedChanges(true);
 		}
 	}
 	
@@ -635,6 +752,9 @@ public class MainWindow {
 			JMenuItem menuItem = new JMenuItem("New");
 			menuItem.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
+					if (handleUnsavedChanges())
+						return;
+					
 					action.newComponent();
 				}
 			});
@@ -644,8 +764,11 @@ public class MainWindow {
 			mitmDelete = new JMenuItem("Delete");
 			mitmDelete.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
+					if (handleUnsavedChanges())
+						return;
+					
 					int option = JOptionPane.showConfirmDialog(frmPartcat,
-							"Are you sure you want to delete " +selComponent.getName() + "?",
+							"Are you sure you want to delete " + selComponent.getName() + "?",
 							"Delete Component", JOptionPane.YES_NO_OPTION,
 							JOptionPane.WARNING_MESSAGE);
 					
