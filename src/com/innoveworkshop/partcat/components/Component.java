@@ -185,8 +185,10 @@ public class Component {
 	 * @return           True if the component folder exists.
 	 */
 	public static boolean exists(PartCatWorkspace workspace, String name) {
-		// TODO: Implement the component existence checking.
-		return true;
+		Path path = workspace.getPath()
+				.resolve(PartCatConstants.COMPONENTS_ROOT).resolve(name);
+		
+		return Files.exists(path) && Files.isDirectory(path);
 	}
 	
 	/**

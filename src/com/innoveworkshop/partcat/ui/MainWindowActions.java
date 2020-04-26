@@ -59,7 +59,13 @@ public class MainWindowActions {
 		
 		// Check if the entered name is empty.
 		if (!name.isEmpty()) {
-			// TODO: Check if the name already exists and fail if so.
+			// Check if the component name already exists.
+			if (Component.exists(window.workspace, name)) {
+				JOptionPane.showMessageDialog(window.frmPartcat,
+						name + " is already in the workspace. Choose a different name.",
+						"Name Not Unique", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
 	
 			try {
 				// Create and save the new component.
