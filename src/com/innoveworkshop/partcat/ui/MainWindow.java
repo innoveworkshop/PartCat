@@ -195,6 +195,9 @@ public class MainWindow {
 		// Table.
 		this.clearPropertiesTable();
 		tblProperties.setEnabled(false);
+		
+		// Component.
+		current_component = null;
 	}
 	
 	/**
@@ -562,7 +565,7 @@ public class MainWindow {
 		
 		@Override
 		public void mousePressed(MouseEvent e) {
-			if (e.isPopupTrigger()) {
+			if (e.isPopupTrigger() && (current_component != null)) {
 				row = tblTable.rowAtPoint(e.getPoint());
 				popupMenu.show(e.getComponent(), e.getX(), e.getY());
 			}
@@ -570,7 +573,7 @@ public class MainWindow {
 		
 		@Override
 		public void mouseReleased(MouseEvent e) {
-			if (e.isPopupTrigger()) {
+			if (e.isPopupTrigger() && (current_component != null)) {
 				row = tblTable.rowAtPoint(e.getPoint());
 				popupMenu.show(e.getComponent(), e.getX(), e.getY());
 			}
@@ -578,7 +581,8 @@ public class MainWindow {
 
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			if ((e.getClickCount() == 2) && isOutsideTable) {
+			if ((e.getClickCount() == 2) && isOutsideTable
+					&& (current_component != null)) {
 				addTableRow();
 			}
 		}
@@ -624,7 +628,7 @@ public class MainWindow {
 			JMenuItem menuItem = new JMenuItem("New");
 			menuItem.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					// TODO: Call the new component action.
+					action.newComponent();
 				}
 			});
 			popupMenu.add(menuItem);
@@ -651,7 +655,7 @@ public class MainWindow {
 		
 		@Override
 		public void mousePressed(MouseEvent e) {
-			if (e.isPopupTrigger()) {
+			if (e.isPopupTrigger() && workspace.isOpen()) {
 				enableDeleteMenu(getComponentFromPosition(e.getX(), e.getY()));
 				popupMenu.show(e.getComponent(), e.getX(), e.getY());
 			}
@@ -659,7 +663,7 @@ public class MainWindow {
 		
 		@Override
 		public void mouseReleased(MouseEvent e) {
-			if (e.isPopupTrigger()) {
+			if (e.isPopupTrigger() && workspace.isOpen()) {
 				enableDeleteMenu(getComponentFromPosition(e.getX(), e.getY()));
 				popupMenu.show(e.getComponent(), e.getX(), e.getY());
 			}
