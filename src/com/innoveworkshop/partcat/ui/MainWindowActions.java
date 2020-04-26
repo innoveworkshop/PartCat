@@ -38,8 +38,10 @@ public class MainWindowActions {
 			window.syncComponentChanges();
 			component.save();
 		} catch (IOException e) {
-			// TODO: Show error dialog.
 			e.printStackTrace();
+			JOptionPane.showMessageDialog(window.frmPartcat,
+					"Something went wrong when trying to save the component.",
+					"Saving Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 	
@@ -88,8 +90,10 @@ public class MainWindowActions {
 				PartCatWorkspace workspace = new PartCatWorkspace(dialog.getSelectedFile().getPath());
 				this.openWorkspace(workspace);
 			} catch (WorkspaceNotFoundException e) {
-				// TODO: Show error dialog.
 				e.printStackTrace();
+				JOptionPane.showMessageDialog(window.frmPartcat,
+						"This doesn't look like a valid PartCat workspace folder.",
+						"Not a Workspace", JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	}
@@ -115,8 +119,10 @@ public class MainWindowActions {
 			this.closeWorkspace();
 			this.openWorkspace(new PartCatWorkspace(path));
 		} catch (WorkspaceNotFoundException e) {
-			// TODO: Show error dialog.
 			e.printStackTrace();
+			JOptionPane.showMessageDialog(window.frmPartcat,
+					"Couldn't find the workspace when trying to reload.",
+					"Workspace Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 	
