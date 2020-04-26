@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.HashMap;
 import java.util.ListIterator;
 import java.util.Map;
@@ -15,6 +17,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JSplitPane;
@@ -268,6 +271,7 @@ public class MainWindow {
 		});
 		
 		JMenuItem mntmNewComponent = new JMenuItem("New Component");
+		mntmNewComponent.setEnabled(false);
 		mntmNewComponent.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_MASK));
 		mnFile.add(mntmNewComponent);
 		
@@ -281,6 +285,7 @@ public class MainWindow {
 		mnFile.add(mntmSave);
 		
 		JMenuItem mntmSaveAs = new JMenuItem("Save As...");
+		mntmSaveAs.setEnabled(false);
 		mnFile.add(mntmSaveAs);
 		
 		JSeparator separator = new JSeparator();
@@ -322,6 +327,7 @@ public class MainWindow {
 		menuBar.add(mnHelp);
 		
 		JMenuItem mntmAbout = new JMenuItem("About...");
+		mntmAbout.setEnabled(false);
 		mnHelp.add(mntmAbout);
 		SpringLayout springLayout = new SpringLayout();
 		frmPartcat.getContentPane().setLayout(springLayout);
@@ -463,6 +469,8 @@ public class MainWindow {
 		
 		DefaultTableModel table_model = new DefaultTableModel(new Object[][] {},
 				new String[] { "Property", "Value" });
+		sclTable.addMouseListener(new PropertiesMousePopupListener(tblProperties, false));
+		tblProperties.addMouseListener(new PropertiesMousePopupListener(tblProperties, true));
 		
 		tblProperties.setCellSelectionEnabled(true);
 		tblProperties.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -484,6 +492,81 @@ public class MainWindow {
 			this.setCurrentComponent(((ComponentTreeNode)node).getComponent());
 		} else {
 			this.clearComponentView();
+		}
+	}
+	
+	/**
+	 * A mouse adapter class to handle the properties table popup menu.
+	 */
+	class PropertiesMousePopupListener extends MouseAdapter {
+		private int row;
+		private boolean isOutsideTable;
+		public JTable tblTable;
+		public JPopupMenu popupMenu;
+		
+		/**
+		 * Creates the popup menu for the properties table.
+		 * 
+		 * @param table      Properties table.
+		 * @param showDelete Show the delete menu item?
+		 */
+		public PropertiesMousePopupListener(JTable table, boolean showDelete) {
+			JMenuItem menuItem;
+			tblTable = table;
+			popupMenu = new JPopupMenu();
+			row = -1;
+			isOutsideTable = !showDelete;
+			
+			// Add property item.
+			menuItem = new JMenuItem("Add");
+			menuItem.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					addTableRow();
+				}
+			});
+			popupMenu.add(menuItem);
+			
+			// Remove property item.
+			if (showDelete) {
+				menuItem = new JMenuItem("Remove");
+				menuItem.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						System.out.println("Remove item at " + String.valueOf(row) + ".");
+					}
+				});
+				popupMenu.add(menuItem);
+			}
+		}
+		
+		@Override
+		public void mousePressed(MouseEvent e) {
+			if (e.isPopupTrigger()) {
+				row = tblTable.rowAtPoint(e.getPoint());
+				popupMenu.show(e.getComponent(), e.getX(), e.getY());
+			}
+		}
+		
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			if (e.isPopupTrigger()) {
+				row = tblTable.rowAtPoint(e.getPoint());
+				popupMenu.show(e.getComponent(), e.getX(), e.getY());
+			}
+		}
+
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			if ((e.getClickCount() == 2) && isOutsideTable) {
+				addTableRow();
+			}
+		}
+		
+		/**
+		 * Adds a new blank row to the table.
+		 */
+		public void addTableRow() {
+			DefaultTableModel model = (DefaultTableModel)tblTable.getModel();
+			model.addRow(new Object[] { "", "" });
 		}
 	}
 }
