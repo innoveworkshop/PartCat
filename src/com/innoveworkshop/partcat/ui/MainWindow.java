@@ -553,7 +553,8 @@ public class MainWindow {
 					public void actionPerformed(ActionEvent e) {
 						int option = JOptionPane.showConfirmDialog(frmPartcat,
 								"Are you sure you want to delete this row?",
-								"Delete Parameter", JOptionPane.YES_NO_OPTION);
+								"Delete Parameter", JOptionPane.YES_NO_OPTION,
+								JOptionPane.WARNING_MESSAGE);
 						
 						if (option == JOptionPane.YES_OPTION)
 							removeTableRow();
@@ -639,7 +640,8 @@ public class MainWindow {
 				public void actionPerformed(ActionEvent e) {
 					int option = JOptionPane.showConfirmDialog(frmPartcat,
 							"Are you sure you want to delete " + selComponent.getName() + "?",
-							"Delete Component", JOptionPane.YES_NO_OPTION);
+							"Delete Component", JOptionPane.YES_NO_OPTION,
+							JOptionPane.WARNING_MESSAGE);
 					
 					if (option == JOptionPane.YES_OPTION) {
 						selComponent.delete();
