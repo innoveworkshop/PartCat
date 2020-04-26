@@ -512,10 +512,12 @@ public class MainWindow {
 		 */
 		public PropertiesMousePopupListener(JTable table, boolean showDelete) {
 			JMenuItem menuItem;
-			tblTable = table;
-			popupMenu = new JPopupMenu();
+			
+			// Set the current state of things.
 			row = -1;
+			tblTable = table;
 			isOutsideTable = !showDelete;
+			popupMenu = new JPopupMenu();
 			
 			// Add property item.
 			menuItem = new JMenuItem("Add");
@@ -531,7 +533,7 @@ public class MainWindow {
 				menuItem = new JMenuItem("Remove");
 				menuItem.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						System.out.println("Remove item at " + String.valueOf(row) + ".");
+						removeTableRow();
 					}
 				});
 				popupMenu.add(menuItem);
@@ -567,6 +569,14 @@ public class MainWindow {
 		public void addTableRow() {
 			DefaultTableModel model = (DefaultTableModel)tblTable.getModel();
 			model.addRow(new Object[] { "", "" });
+		}
+		
+		/**
+		 * Removes a specific row from the table.
+		 */
+		public void removeTableRow() {
+			DefaultTableModel model = (DefaultTableModel)tblTable.getModel();
+			model.removeRow(row);
 		}
 	}
 }
