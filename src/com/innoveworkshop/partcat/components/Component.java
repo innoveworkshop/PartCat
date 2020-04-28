@@ -225,6 +225,13 @@ public class Component {
 	}
 	
 	/**
+	 * Reloads the image associated with this component.
+	 */
+	public void reloadImage() {
+		loadImage();
+	}
+	
+	/**
 	 * Gets the path to the component folder as a {@link Path}.
 	 * 
 	 * @return Path to the component folder.
@@ -418,6 +425,8 @@ public class Component {
 		strBuilder.append(this.isNewlyCreated());
 		strBuilder.append("\nQuantity: ");
 		strBuilder.append(this.getQuantity());
+		strBuilder.append("\nImage Name: ");
+		strBuilder.append(this.getImage().getName());
 		
 		// Go through properties.
 		strBuilder.append("\nProperties:\n");
