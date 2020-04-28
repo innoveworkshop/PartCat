@@ -1,5 +1,6 @@
 package com.innoveworkshop.partcat.components;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -33,7 +34,12 @@ public class ComponentProperties extends HashMap<String, String> {
 	 * @throws FileNotFoundException If the manifest file doesn't exist.
 	 */
 	public void parseManifest(Path manifestPath) throws FileNotFoundException {
-		Scanner input = new Scanner(manifestPath.toFile());
+		File file = manifestPath.toFile();
+		if (!file.exists())
+			throw new FileNotFoundException("Couldn't locate the component manifest in path " +
+					manifestPath.toString());
+		
+		Scanner input = new Scanner(file);
 		Pattern pattern = Pattern.compile("^([A-Za-z0-9\\-]+): (.+)$");
 		
 		// Read manifest line-by-line.
@@ -52,6 +58,8 @@ public class ComponentProperties extends HashMap<String, String> {
 				System.err.println("Invalid manifest line: " + line);
 			}
 		}
+		
+		input.close();
 	}
 	
 	/**
