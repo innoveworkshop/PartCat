@@ -75,7 +75,7 @@ public class MainWindow {
 	
 	public JFrame frmPartcat;
 	public JTree treeComponents;
-	public JTextField txtSearch;
+	public JTextField txtFilter;
 	public JLabel lblImage;
 	public JTextField txtName;
 	public JSpinner spnQuantity;
@@ -84,6 +84,8 @@ public class MainWindow {
 	public JButton btnDatasheet;
 	public JButton btnModel;
 	public JButton btnExtras;
+	
+	// TODO: Implement the datasheet, model and other buttons with popup menus.
 
 	/**
 	 * Creates the main frame.
@@ -125,18 +127,27 @@ public class MainWindow {
 	}
 	
 	/**
-	 * Populates the tree view using a components list iterator.
+	 * Populates the tree view using a components list iterator and a filtering
+	 * {@link String}.
 	 * 
-	 * @param iter Components list iterator.
-	 * @see {@link Component.componentIterator()}
+	 * @param iter   Components list iterator.
+	 * @param filter A filtering string to be applied when populating.
+	 * 
+	 * @see {@link Component#componentIterator}
 	 */
-	public void populateComponentsTree(ListIterator<Component> iter) {
+	public void populateComponentsTree(ListIterator<Component> iter, String filter) {
 		// Create the tree root node.
 		DefaultMutableTreeNode root = new DefaultMutableTreeNode("Components");
 		
 		// Go through components adding them to the tree.
 		while (iter.hasNext()) {
 			Component comp = iter.next();
+			
+			// Check if we should apply any filtering.
+			if (!filter.isEmpty()) {
+				if (!comp.getName().toLowerCase().contains(filter.toLowerCase()))
+					continue;
+			}
 			
 			// Check if the component has been deleted before adding it.
 			if (!comp.isDeleted())
@@ -145,6 +156,27 @@ public class MainWindow {
 		
 		// Set the tree model.
 		treeComponents.setModel(new DefaultTreeModel(root));
+	}
+	
+
+	
+	/**
+	 * Populates the tree view using a components list iterator.
+	 * 
+	 * @param iter   Components list iterator.
+	 * @see {@link Component#componentIterator}
+	 */
+	public void populateComponentsTree(ListIterator<Component> iter) {
+		populateComponentsTree(iter, "");
+	}
+	
+	/**
+	 * Applies filtering to the component tree view via a filtering string.
+	 * 
+	 * @param filter A filtering string.
+	 */
+	public void applyTreeFiltering(String filter) {
+		populateComponentsTree(workspace.componentIterator(), filter);
 	}
 	
 	/**
@@ -508,20 +540,27 @@ public class MainWindow {
 		sl_leftPanel.putConstraint(SpringLayout.EAST, treeComponents, -5, SpringLayout.EAST, leftPanel);
 		sclTree.setViewportView(treeComponents);
 		
-		txtSearch = new JTextField();
-		sl_leftPanel.putConstraint(SpringLayout.WEST, txtSearch, 0, SpringLayout.WEST, sclTree);
-		leftPanel.add(txtSearch);
-		txtSearch.setToolTipText("Search");
-		txtSearch.setColumns(10);
-		
-		JButton btnSearch = new JButton("Search");
-		sl_leftPanel.putConstraint(SpringLayout.NORTH, txtSearch, 0, SpringLayout.NORTH, btnSearch);
-		sl_leftPanel.putConstraint(SpringLayout.SOUTH, txtSearch, 0, SpringLayout.SOUTH, btnSearch);
-		sl_leftPanel.putConstraint(SpringLayout.EAST, txtSearch, -5, SpringLayout.WEST, btnSearch);
-		sl_leftPanel.putConstraint(SpringLayout.SOUTH, sclTree, -5, SpringLayout.NORTH, btnSearch);
-		sl_leftPanel.putConstraint(SpringLayout.SOUTH, btnSearch, -5, SpringLayout.SOUTH, leftPanel);
-		sl_leftPanel.putConstraint(SpringLayout.EAST, btnSearch, 0, SpringLayout.EAST, sclTree);
-		leftPanel.add(btnSearch);
+		txtFilter = new JTextField();
+		sl_leftPanel.putConstraint(SpringLayout.SOUTH, txtFilter, -5, SpringLayout.SOUTH, leftPanel);
+		sl_leftPanel.putConstraint(SpringLayout.SOUTH, sclTree, -5, SpringLayout.NORTH, txtFilter);
+		sl_leftPanel.putConstraint(SpringLayout.WEST, txtFilter, 0, SpringLayout.WEST, sclTree);
+		sl_leftPanel.putConstraint(SpringLayout.EAST, txtFilter, 0, SpringLayout.EAST, sclTree);
+		leftPanel.add(txtFilter);
+		txtFilter.setToolTipText("Filter");
+		txtFilter.setColumns(10);
+		txtFilter.getDocument().addDocumentListener(new DocumentListener() {
+			public void changedUpdate(DocumentEvent e) {
+				applyTreeFiltering(txtFilter.getText());
+			}
+
+			public void insertUpdate(DocumentEvent e) {
+				applyTreeFiltering(txtFilter.getText());
+			}
+
+			public void removeUpdate(DocumentEvent e) {
+				applyTreeFiltering(txtFilter.getText());
+			}
+		});
 		
 		JPanel rightPanel = new JPanel();
 		splitPane.setRightComponent(rightPanel);
@@ -681,6 +720,7 @@ public class MainWindow {
 			// Node is a component.
 			setCurrentComponent(((ComponentTreeNode)node).getComponent());
 		} else {
+			// Nope, not a component, so clear out.
 			clearComponentView();
 		}
 	}
