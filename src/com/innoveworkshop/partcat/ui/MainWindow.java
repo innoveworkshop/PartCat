@@ -66,10 +66,11 @@ import javax.swing.JSeparator;
  */
 public class MainWindow {
 	private boolean unsavedChanges;
+	private boolean ignoreUnsaved;
 	
 	public MainWindowActions action;
 	public PartCatWorkspace workspace;
-	public Component current_component;
+	public Component currentComponent;
 	public PropertiesTableModelListener tblModelListener;
 	
 	public JFrame frmPartcat;
@@ -90,7 +91,8 @@ public class MainWindow {
 	 * @wbp.parser.constructor
 	 */
 	public MainWindow() {
-		this.current_component = null;
+		this.ignoreUnsaved = false;
+		this.currentComponent = null;
 		this.action = new MainWindowActions(this);
 		
 		// Set the look and feel to be more native looking.
@@ -149,12 +151,12 @@ public class MainWindow {
 	 * Syncs the component changes in the UI to the {@link Component} object.
 	 */
 	public void syncComponentChanges() {
-		current_component.setQuantity((Integer)spnQuantity.getValue());
-		current_component.setNotes(txtNotes.getText());
+		currentComponent.setQuantity((Integer)spnQuantity.getValue());
+		currentComponent.setNotes(txtNotes.getText());
 		
 		// Properties.
 		DefaultTableModel model = (DefaultTableModel)tblProperties.getModel();
-		ComponentProperties prop = current_component.getProperties();
+		ComponentProperties prop = currentComponent.getProperties();
 		prop.clear();
 		for (int row = 0; row < model.getRowCount(); row++) {
 			prop.put((String)model.getValueAt(row, 0), (String)model.getValueAt(row, 1));
@@ -222,7 +224,7 @@ public class MainWindow {
 		tblProperties.setEnabled(false);
 		
 		// Component.
-		current_component = null;
+		currentComponent = null;
 		setUnsavedChanges(false);
 	}
 	
@@ -269,9 +271,9 @@ public class MainWindow {
 	 * @param component {@link Component} to be shown/edited.
 	 */
 	public void setCurrentComponent(Component component) {
-		current_component = component;
+		currentComponent = component;
 		
-		showComponent(current_component);
+		showComponent(currentComponent);
 		setUnsavedChanges(false);
 	}
 	
@@ -331,7 +333,7 @@ public class MainWindow {
 	 * @return True if we do have unsaved changes to commit.
 	 */
 	public boolean hasUnsavedChanges() {
-		return this.unsavedChanges;
+		return this.unsavedChanges && !this.ignoreUnsaved;
 	}
 	
 	/**
@@ -408,7 +410,7 @@ public class MainWindow {
 		JMenuItem mntmSave = new JMenuItem("Save");
 		mntmSave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				action.saveComponent(current_component);
+				action.saveComponent(currentComponent);
 			}
 		});
 		mntmSave.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK));
@@ -494,10 +496,11 @@ public class MainWindow {
 		treeComponents.addMouseListener(new ComponentMousePopupListener(treeComponents));
 		treeComponents.addTreeSelectionListener(new TreeSelectionListener() {
 			public void valueChanged(TreeSelectionEvent event) {
-				if (handleUnsavedChanges())
-					return;
-				
-				componentTreeValueChanged(event);
+				if (!ignoreUnsaved) {
+					componentTreeValueChanged(event);
+				} else {
+					ignoreUnsaved = false;
+				}
 			}
 		});
 		sl_leftPanel.putConstraint(SpringLayout.NORTH, treeComponents, 5, SpringLayout.NORTH, leftPanel);
@@ -666,8 +669,14 @@ public class MainWindow {
 	public void componentTreeValueChanged(TreeSelectionEvent event) {
 		Object node = event.getPath().getLastPathComponent();
 		
-		// TODO: Go back to the last selection if the user decides not to discard changes in the unsaved dialog.
+		// Check for unsaved changes and go to the previous selection if aborted.
+		if (handleUnsavedChanges()) {
+			ignoreUnsaved = true;
+			treeComponents.setSelectionPath(event.getOldLeadSelectionPath());
+			return;
+		}
 		
+		ignoreUnsaved = false;
 		if (node instanceof ComponentTreeNode) {
 			// Node is a component.
 			setCurrentComponent(((ComponentTreeNode)node).getComponent());
@@ -729,7 +738,7 @@ public class MainWindow {
 		
 		@Override
 		public void mousePressed(MouseEvent e) {
-			if (e.isPopupTrigger() && (current_component != null)) {
+			if (e.isPopupTrigger() && (currentComponent != null)) {
 				row = tblTable.rowAtPoint(e.getPoint());
 				popupMenu.show(e.getComponent(), e.getX(), e.getY());
 			}
@@ -737,7 +746,7 @@ public class MainWindow {
 		
 		@Override
 		public void mouseReleased(MouseEvent e) {
-			if (e.isPopupTrigger() && (current_component != null)) {
+			if (e.isPopupTrigger() && (currentComponent != null)) {
 				row = tblTable.rowAtPoint(e.getPoint());
 				popupMenu.show(e.getComponent(), e.getX(), e.getY());
 			}
@@ -746,7 +755,7 @@ public class MainWindow {
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			if ((e.getClickCount() == 2) && isOutsideTable
-					&& (current_component != null)) {
+					&& (currentComponent != null)) {
 				addTableRow();
 			}
 		}
@@ -905,7 +914,7 @@ public class MainWindow {
 			menuItem = new JMenuItem("Add");
 			menuItem.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					action.selectComponentImage(current_component);
+					action.selectComponentImage(currentComponent);
 				}
 			});
 			popupMenu.add(menuItem);
@@ -914,8 +923,8 @@ public class MainWindow {
 			menuItem = new JMenuItem("Remove");
 			menuItem.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					current_component.removeImage();
-					setComponentImageLabel(current_component);
+					currentComponent.removeImage();
+					setComponentImageLabel(currentComponent);
 					setUnsavedChanges(true);
 				}
 			});
@@ -924,22 +933,22 @@ public class MainWindow {
 		
 		@Override
 		public void mousePressed(MouseEvent e) {
-			if (e.isPopupTrigger() && (current_component != null)) {
+			if (e.isPopupTrigger() && (currentComponent != null)) {
 				popupMenu.show(e.getComponent(), e.getX(), e.getY());
 			}
 		}
 		
 		@Override
 		public void mouseReleased(MouseEvent e) {
-			if (e.isPopupTrigger() && (current_component != null)) {
+			if (e.isPopupTrigger() && (currentComponent != null)) {
 				popupMenu.show(e.getComponent(), e.getX(), e.getY());
 			}
 		}
 		
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			if ((e.getClickCount() == 2) && (current_component != null)) {
-				action.selectComponentImage(current_component);
+			if ((e.getClickCount() == 2) && (currentComponent != null)) {
+				action.selectComponentImage(currentComponent);
 			}
 		}
 	}
@@ -958,10 +967,12 @@ public class MainWindow {
 				if (row_key.equals("Package")) {
 					// We are dealing with a package change.
 					syncComponentChanges();
-					current_component.reloadImage();
-					setComponentImageLabel(current_component);
+					currentComponent.reloadImage();
+					setComponentImageLabel(currentComponent);
 				}
 			}
+			
+			setUnsavedChanges(true);
 		}
 	}
 }
