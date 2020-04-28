@@ -4,7 +4,9 @@ import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -114,16 +116,42 @@ public class ComponentImage {
 	}
 	
 	/**
+	 * Sets the path to the image file. If the image is outside the workspace,
+	 * this function will also import the file to the workspace.
+	 * 
+	 * @param path Path to the image file.
+	 * @param name Name of the image. Only used if it's necessary to import the
+	 *             image into workspace.
+	 */
+	public void setPath(Path path, String name) {
+		if (path != null) {
+			if (!path.startsWith(workspace.getImagesPath())) {
+				// The selected image is outside the workspace images folder. Let's bring it in.
+				String destFilename = name + FileUtilities.getFileExtension(path, true);
+				Path dest = workspace.getImagesPath().resolve(destFilename);
+				
+				try {
+					Files.copy(path, dest, StandardCopyOption.COPY_ATTRIBUTES);
+					path = dest;
+				} catch (IOException e) {
+					e.printStackTrace();
+					path = null;
+				}
+			}
+		}
+		
+		this.path = path;
+		usingDefault = (this.path == null);
+		setName(FileUtilities.getFilenameWithoutExt(path), false);
+	}
+	
+	/**
 	 * Sets the path to the image file.
 	 * 
 	 * @param path Path to the image file.
 	 */
 	public void setPath(Path path) {
-		// TODO: Make it so that if the selected image is outside the images directory we'll copy the image to it.
-		this.path = path;
-		usingDefault = (this.path == null);
-		
-		setName(FileUtilities.getFilenameWithoutExt(path), false);
+		setPath(path, null);
 	}
 	
 	/**

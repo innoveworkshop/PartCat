@@ -288,7 +288,6 @@ public class MainWindow {
 			return;
 		}
 		
-		System.out.println(component.getImage().getIcon());
 		if (component.getImage().getIcon() == null) {
 			lblImage.setText("No Image");
 			lblImage.setIcon(null);
@@ -666,6 +665,8 @@ public class MainWindow {
 	 */
 	public void componentTreeValueChanged(TreeSelectionEvent event) {
 		Object node = event.getPath().getLastPathComponent();
+		
+		// TODO: Go back to the last selection if the user decides not to discard changes in the unsaved dialog.
 		
 		if (node instanceof ComponentTreeNode) {
 			// Node is a component.

@@ -6,6 +6,7 @@ import java.nio.file.Path;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.innoveworkshop.partcat.PartCatWorkspace;
 import com.innoveworkshop.partcat.components.Component;
@@ -38,12 +39,18 @@ public class MainWindowActions {
 		// Setup the file chooser.
 		JFileChooser dialog = new JFileChooser();
 		dialog.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		dialog.setAcceptAllFileFilterUsed(true);
 		dialog.setDialogTitle("Select Component Image");
 		dialog.setCurrentDirectory(window.workspace.getImagesPath().toFile());
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("Image Files",
+				"gif", "png", "jpg", "jpeg", "bmp");
+		dialog.addChoosableFileFilter(filter);
+		dialog.setFileFilter(filter);
 		
 		// Show the dialog and handle the open operation only if approved.
-		if (dialog.showOpenDialog(window.frmPartcat) == JFileChooser.APPROVE_OPTION) {
-			component.getImage().setPath(dialog.getSelectedFile().toPath());
+		if (dialog.showDialog(window.frmPartcat, "Select Image") == JFileChooser.APPROVE_OPTION) {
+			component.getImage().setPath(dialog.getSelectedFile().toPath(),
+					component.getName());
 			window.setComponentImageLabel(component);
 			window.setUnsavedChanges(true);
 		}
@@ -114,7 +121,7 @@ public class MainWindowActions {
 		dialog.setDialogTitle("Open Workspace");
 		
 		// Show the dialog and handle the open operation only if approved.
-		if (dialog.showOpenDialog(window.frmPartcat) == JFileChooser.APPROVE_OPTION) {
+		if (dialog.showDialog(window.frmPartcat, "Open Workspace") == JFileChooser.APPROVE_OPTION) {
 			try {
 				PartCatWorkspace workspace = new PartCatWorkspace(dialog.getSelectedFile().getPath());
 				this.openWorkspace(workspace);
