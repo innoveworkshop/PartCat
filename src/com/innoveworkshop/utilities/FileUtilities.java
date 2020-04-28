@@ -106,9 +106,9 @@ public class FileUtilities {
             String name = path.getFileName().toString();
             
             if (includeDot) {
-            	extension = name.substring(name.lastIndexOf(".") + 1);
-            } else {
             	extension = name.substring(name.lastIndexOf("."));
+            } else {
+            	extension = name.substring(name.lastIndexOf(".") + 1);
             }
         } catch (Exception e) {
             extension = "";
