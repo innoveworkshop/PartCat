@@ -109,10 +109,16 @@ public class Component {
 		
 		// Load image.
 		try {
-			// TODO: Check if we have a IMAGE file and load data from it.
-			if (prop.containsKey("Package")) {
-				// Load image based on package.
-				image = new ComponentImage(workspace, prop.get("Package"));
+			Path image_path = path.resolve(PartCatConstants.IMAGE_FILE);
+			if (image_path.toFile().exists()) {
+				// Get image name from image declaration file.
+				String image_name = FileUtilities.slurpFile(image_path);
+				image_name.trim();
+				
+				image = new ComponentImage(workspace, image_name);
+			} else if (prop.containsKey("Package")) {
+				// Load image based on device package.
+				image = new ComponentImage(workspace, prop.get("Package"), true);
 			}
 		} catch (Exception e) {
 			// Fallback to a default image.
@@ -162,14 +168,17 @@ public class Component {
 				String.valueOf(this.getQuantity()));
 		
 		// Notes file.
-		if (this.getNotes() != null)
+		if (getNotes() != null)
 			FileUtilities.writeFileContents(path.resolve(PartCatConstants.NOTES_FILE),
-					this.getNotes());
+					getNotes());
 		
 		// Properties file.
 		prop.saveManifest(path.resolve(PartCatConstants.MANIFEST_FILE));
 		
-		// TODO: Save image.
+		// Image file.
+		if (!getImage().isUsingDefaults())
+			FileUtilities.writeFileContents(path.resolve(PartCatConstants.IMAGE_FILE),
+					getImage().getName());
 	}
 	
 	/**

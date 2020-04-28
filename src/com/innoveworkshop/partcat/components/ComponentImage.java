@@ -52,25 +52,16 @@ public class ComponentImage {
 	}
 	
 	/**
-	 * Saves the image name to a specified file.
+	 * Creates a new component image based on its name.
 	 * 
-	 * @param filePath {@link Path} to the file that will store the name of the image.
+	 * @param workspace A PartCat active workspace.
+	 * @param name      Name of the image to use.
+	 * @param isDefault Should this name be treated as a "default image".
 	 */
-	public void saveName(Path filePath) {
-		// TODO: Save image only if default is not being used.
-		/*
-		// Build manifest file contents string.
-		StringBuilder strBuilder = new StringBuilder();
-		for (Map.Entry<String, String> entry : this.entrySet()) {
-			strBuilder.append(entry.getKey());
-			strBuilder.append(": ");
-			strBuilder.append(entry.getValue());
-			strBuilder.append("\n");
-		}
-		
-		// Save contents to file.
-		FileUtilities.writeFileContents(manifestPath, strBuilder.toString());
-		*/
+	public ComponentImage(PartCatWorkspace workspace, String name,
+			boolean isDefault) throws Exception {
+		this(workspace, name);
+		this.usingDefault = isDefault;
 	}
 	
 	/**
@@ -119,11 +110,7 @@ public class ComponentImage {
 	 * @return Image file path.
 	 */
 	public Path getPath() {
-		if (!usingDefault)
-			return path;
-		
-		// TODO: Create a default image to return.
-		return null;
+		return path;
 	}
 	
 	/**
