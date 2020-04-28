@@ -82,7 +82,6 @@ public class MainWindow {
 	public JButton btnExtras;
 	
 	// TODO: Listen for properties table changes and change the component image if a package is defined.
-	// TODO: Implement a popup menu for the image to be able to delete it.
 
 	/**
 	 * Creates the main frame.
@@ -521,14 +520,7 @@ public class MainWindow {
 		rightPanel.setLayout(sl_rightPanel);
 		
 		lblImage = new JLabel("Image");
-		lblImage.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				if (e.getClickCount() == 2) {
-					action.selectComponentImage(current_component);
-				}
-			}
-		});
+		lblImage.addMouseListener(new ImageMousePopupListener(lblImage));
 		lblImage.setBackground(Color.GRAY);
 		sl_rightPanel.putConstraint(SpringLayout.NORTH, lblImage, 5, SpringLayout.NORTH, rightPanel);
 		sl_rightPanel.putConstraint(SpringLayout.WEST, lblImage, 5, SpringLayout.WEST, rightPanel);
@@ -879,6 +871,68 @@ public class MainWindow {
 		 */
 		private void enableDeleteMenu(boolean enable) {
 			mitmDelete.setEnabled(enable);
+		}
+	}
+	
+	/**
+	 * A mouse adapter class to handle the image popup menu.
+	 */
+	class ImageMousePopupListener extends MouseAdapter {
+		public JLabel label;
+		public JPopupMenu popupMenu;
+		
+		/**
+		 * Creates the popup menu for the component image label.
+		 * 
+		 * @param label Component image {@link JLabel}.
+		 */
+		public ImageMousePopupListener(JLabel label) {
+			JMenuItem menuItem;
+			
+			// Set the current state of things.
+			this.label = label;
+			popupMenu = new JPopupMenu();
+			
+			// Add image item.
+			menuItem = new JMenuItem("Add");
+			menuItem.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					action.selectComponentImage(current_component);
+				}
+			});
+			popupMenu.add(menuItem);
+			
+			// Remove image item.
+			menuItem = new JMenuItem("Remove");
+			menuItem.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					current_component.removeImage();
+					setComponentImageLabel(current_component);
+					setUnsavedChanges(true);
+				}
+			});
+			popupMenu.add(menuItem);
+		}
+		
+		@Override
+		public void mousePressed(MouseEvent e) {
+			if (e.isPopupTrigger() && (current_component != null)) {
+				popupMenu.show(e.getComponent(), e.getX(), e.getY());
+			}
+		}
+		
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			if (e.isPopupTrigger() && (current_component != null)) {
+				popupMenu.show(e.getComponent(), e.getX(), e.getY());
+			}
+		}
+		
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			if ((e.getClickCount() == 2) && (current_component != null)) {
+				action.selectComponentImage(current_component);
+			}
 		}
 	}
 }

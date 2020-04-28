@@ -108,22 +108,7 @@ public class Component {
 		prop.parseManifest(manifest_path);
 		
 		// Load image.
-		try {
-			Path image_path = path.resolve(PartCatConstants.IMAGE_FILE);
-			if (image_path.toFile().exists()) {
-				// Get image name from image declaration file.
-				String image_name = FileUtilities.slurpFile(image_path);
-				image_name.trim();
-				
-				image = new ComponentImage(workspace, image_name);
-			} else if (getPackage() != null) {
-				// Load image based on device package.
-				image = new ComponentImage(workspace, getPackage(), true);
-			}
-		} catch (Exception e) {
-			// Fallback to a default image.
-			image = new ComponentImage(workspace);
-		}
+		loadImage();
 		
 		// Load the quantity file.
 		try {
@@ -217,6 +202,29 @@ public class Component {
 	}
 	
 	/**
+	 * Loads the component image appropriately, taking into account the package,
+	 * and etc.
+	 */
+	private void loadImage() {
+		try {
+			Path image_path = path.resolve(PartCatConstants.IMAGE_FILE);
+			if (image_path.toFile().exists()) {
+				// Get image name from image declaration file.
+				String image_name = FileUtilities.slurpFile(image_path);
+				image_name.trim();
+				
+				image = new ComponentImage(workspace, image_name);
+			} else if (getPackage() != null) {
+				// Load image based on device package.
+				image = new ComponentImage(workspace, getPackage(), true);
+			}
+		} catch (Exception e) {
+			// Fallback to a default image.
+			image = new ComponentImage(workspace);
+		}
+	}
+	
+	/**
 	 * Gets the path to the component folder as a {@link Path}.
 	 * 
 	 * @return Path to the component folder.
@@ -248,6 +256,21 @@ public class Component {
 					"already has one");
 		
 		this.name = name;
+	}
+	
+	/**
+	 * Removes the associated image.
+	 */
+	public void removeImage() {
+		try {
+			// Delete the image definition file.
+			Files.deleteIfExists(path.resolve(PartCatConstants.IMAGE_FILE));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		// Reload the images.
+		loadImage();
 	}
 	
 	/**
