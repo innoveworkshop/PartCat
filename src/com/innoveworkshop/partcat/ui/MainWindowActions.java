@@ -43,8 +43,7 @@ public class MainWindowActions {
 		
 		// Show the dialog and handle the open operation only if approved.
 		if (dialog.showOpenDialog(window.frmPartcat) == JFileChooser.APPROVE_OPTION) {
-			// TODO: Make it so that if the selected image is outside the images directory we'll copy the image to it.
-			component.setImage(dialog.getSelectedFile().getName());
+			component.getImage().setPath(dialog.getSelectedFile().toPath());
 			window.setUnsavedChanges(true);
 		}
 	}

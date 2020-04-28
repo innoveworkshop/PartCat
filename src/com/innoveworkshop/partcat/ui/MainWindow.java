@@ -72,6 +72,7 @@ public class MainWindow {
 	public JFrame frmPartcat;
 	public JTree treeComponents;
 	public JTextField txtSearch;
+	public JLabel lblImage;
 	public JTextField txtName;
 	public JSpinner spnQuantity;
 	public JTextArea txtNotes;
@@ -169,6 +170,10 @@ public class MainWindow {
 		txtNotes.setEnabled(true);
 		tblProperties.setEnabled(true);
 		
+		// Set image.
+		lblImage.setText("");
+		lblImage.setIcon(component.getImage().getIcon(lblImage.getSize(), true));
+		
 		// Set text items.
 		txtName.setText(component.getName());
 		spnQuantity.setValue(Integer.valueOf(component.getQuantity()));
@@ -186,7 +191,7 @@ public class MainWindow {
 		// Populate the table with data.
 		this.setPropertiesTableContents(component.getProperties());
 		
-		// Clear dirtyness.
+		// Clear dirtiness.
 		setUnsavedChanges(false);
 	}
 	
@@ -194,6 +199,10 @@ public class MainWindow {
 	 * Clears the component view area.
 	 */
 	protected void clearComponentView() {
+		// Image controls.
+		lblImage.setText("Image");
+		lblImage.setIcon(null);
+		
 		// Text controls.
 		txtName.setText("");
 		txtName.setEnabled(false);
@@ -487,7 +496,7 @@ public class MainWindow {
 		SpringLayout sl_rightPanel = new SpringLayout();
 		rightPanel.setLayout(sl_rightPanel);
 		
-		JLabel lblImage = new JLabel("Image");
+		lblImage = new JLabel("Image");
 		lblImage.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {

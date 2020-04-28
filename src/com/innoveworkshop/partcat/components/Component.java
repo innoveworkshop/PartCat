@@ -24,6 +24,7 @@ public class Component {
 	private int quantity;
 	private ComponentProperties prop;
 	private String notes;
+	private ComponentImage image;
 	private boolean newly_created;
 	private boolean deleted;
 
@@ -50,6 +51,7 @@ public class Component {
 		this.prop = new ComponentProperties();
 		this.newly_created = true;
 		this.deleted = false;
+		this.image = new ComponentImage(this.workspace);
 	}
 	
 	/**
@@ -88,7 +90,7 @@ public class Component {
 						"exist or isn't a directory.");
 			
 			// Populate the object.
-			this.populateFromPath(path);
+			populateFromPath(path);
 		}
 	}
 	
@@ -104,6 +106,14 @@ public class Component {
 		// Load the manifest file.
 		Path manifest_path = path.resolve(PartCatConstants.MANIFEST_FILE);
 		prop.parseManifest(manifest_path);
+		
+		// TODO: Load image.
+		try {
+			image = new ComponentImage(workspace, "TO-92");
+		} catch (Exception e) {
+			image = new ComponentImage(workspace);
+			e.printStackTrace();
+		}
 		
 		// Load the quantity file.
 		try {
@@ -232,20 +242,9 @@ public class Component {
 	 * 
 	 * @return Component image name or NULL if there isn't one associated.
 	 */
-	public String getImage() {
-		// TODO: Make this return a ComponentImage object.
+	public ComponentImage getImage() {
 		// TODO: Use "case image" if there's a case property defined.
-		return null;
-	}
-	
-	/**
-	 * Sets a component image based on the name said image.
-	 * 
-	 * @param name Image name to be associated with this component.
-	 */
-	public void setImage(String name) {
-		// TODO: Implement the image setting.
-		System.out.println("Setting the component image to: " + name);
+		return image;
 	}
 	
 	/**

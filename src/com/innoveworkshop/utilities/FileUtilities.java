@@ -74,4 +74,17 @@ public class FileUtilities {
 		
 		return path.delete();
 	}
+	
+	/**
+	 * Gets the filename from a path and removes the extension.
+	 * 
+	 * @param  path Path to the file.
+	 * @return      Filename without extension.
+	 */
+	public static String getFilenameWithoutExt(Path path) {
+		if (path == null)
+			return null;
+		
+		return path.getFileName().toString().replaceFirst("[.][^.]+$", "");
+	}
 }
