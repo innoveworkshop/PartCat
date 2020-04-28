@@ -16,7 +16,7 @@ public class FileUtilities {
 	/**
 	 * Slurps the contents of a file.
 	 * 
-	 * @param  path Path to the file as a {@link Path}
+	 * @param  path {@link Path} to the file.
 	 * @return      Contents of the file.
 	 * 
 	 * @throws FileNotFoundException If the file wasn't found.
@@ -41,7 +41,7 @@ public class FileUtilities {
 	 * Overrides the contents of a file. This function will create the file if
 	 * it doesn't exist.
 	 * 
-	 * @param path     Path to the file to be written.
+	 * @param path     {@link Path} to the file to be written.
 	 * @param contents Contents to be written to the file.
 	 * 
 	 * @throws IOException If something goes wrong.
@@ -60,7 +60,7 @@ public class FileUtilities {
 	/**
 	 * Deletes a whole directory recursively.
 	 * 
-	 * @param  path Path to the directory to be deleted.
+	 * @param  path {@link Path} to the directory to be deleted.
 	 * @return      True if the directory was deleted successfully.
 	 */
 	public static boolean deleteDirectory(File path) {
@@ -78,7 +78,7 @@ public class FileUtilities {
 	/**
 	 * Gets the filename from a path and removes the extension.
 	 * 
-	 * @param  path Path to the file.
+	 * @param  path {@link Path} to the file.
 	 * @return      Filename without extension.
 	 */
 	public static String getFilenameWithoutExt(Path path) {
@@ -87,4 +87,44 @@ public class FileUtilities {
 		
 		return path.getFileName().toString().replaceFirst("[.][^.]+$", "");
 	}
+	
+	/**
+	 * Gets the extension of a given file {@link Path}.
+	 * 
+	 * @param  path       {@link Path} to the file to get the extension.
+	 * @param  includeDot Should we include the extension dot?
+	 * @return            Extension of the file, or an empty string if the file
+	 *                    doesn't exist of doesn't contain one.
+	 */
+    public static String getFileExtension(Path path, boolean includeDot) {
+        String extension = "";
+        
+		if (path == null)
+			return extension;
+ 
+		try {
+            String name = path.getFileName().toString();
+            
+            if (includeDot) {
+            	extension = name.substring(name.lastIndexOf(".") + 1);
+            } else {
+            	extension = name.substring(name.lastIndexOf("."));
+            }
+        } catch (Exception e) {
+            extension = "";
+        }
+ 
+        return extension;
+    }
+    
+	/**
+	 * Gets the extension without the extension dot from a file {@link Path}.
+	 * 
+	 * @param  path {@link Path} to the file to get the extension.
+	 * @return      Extension of the file, or an empty string if the file
+	 *              doesn't exist of doesn't contain one.
+	 */
+    public static String getFileExtension(Path path) {
+    	return getFileExtension(path, false);
+    }
 }
