@@ -171,8 +171,13 @@ public class MainWindow {
 		tblProperties.setEnabled(true);
 		
 		// Set image.
-		lblImage.setText("");
-		lblImage.setIcon(component.getImage().getIcon(lblImage.getSize(), true));
+		if (component.getImage().getIcon() == null) {
+			lblImage.setText("No Image");
+			lblImage.setIcon(null);
+		} else {
+			lblImage.setText("");
+			lblImage.setIcon(component.getImage().getIcon(lblImage.getSize(), true));
+		}
 		
 		// Set text items.
 		txtName.setText(component.getName());
@@ -200,7 +205,7 @@ public class MainWindow {
 	 */
 	protected void clearComponentView() {
 		// Image controls.
-		lblImage.setText("Image");
+		lblImage.setText("No Image");
 		lblImage.setIcon(null);
 		
 		// Text controls.

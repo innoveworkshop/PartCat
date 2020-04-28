@@ -145,8 +145,11 @@ public class ComponentImage {
 	 * @return Component image as a {@link BufferedImage}.
 	 */
 	public BufferedImage getImage() {
+		Path path = getPath();
+
 		try {
-			return ImageIO.read(getPath().toFile());
+			if (path != null)
+				return ImageIO.read(getPath().toFile());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

@@ -107,12 +107,16 @@ public class Component {
 		Path manifest_path = path.resolve(PartCatConstants.MANIFEST_FILE);
 		prop.parseManifest(manifest_path);
 		
-		// TODO: Load image.
+		// Load image.
 		try {
-			image = new ComponentImage(workspace, "TO-92");
+			// TODO: Check if we have a IMAGE file and load data from it.
+			if (prop.containsKey("Package")) {
+				// Load image based on package.
+				image = new ComponentImage(workspace, prop.get("Package"));
+			}
 		} catch (Exception e) {
+			// Fallback to a default image.
 			image = new ComponentImage(workspace);
-			e.printStackTrace();
 		}
 		
 		// Load the quantity file.
