@@ -410,7 +410,7 @@ public class Component {
 	}
 
 	/**
-	 * Gets a string representation of the component in the for of a summary.
+	 * Gets a string representation of the component in the form of a summary.
 	 */
 	@Override
 	public String toString() {
@@ -425,8 +425,13 @@ public class Component {
 		strBuilder.append(this.isNewlyCreated());
 		strBuilder.append("\nQuantity: ");
 		strBuilder.append(this.getQuantity());
-		strBuilder.append("\nImage Name: ");
+		
+		// Go through image.
+		strBuilder.append("\nImage: ");
+		strBuilder.append("\n\tName: ");
 		strBuilder.append(this.getImage().getName());
+		strBuilder.append("\n\tPath: ");
+		strBuilder.append(this.getImage().getPath());
 		
 		// Go through properties.
 		strBuilder.append("\nProperties:\n");
