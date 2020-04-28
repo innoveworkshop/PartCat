@@ -44,6 +44,7 @@ public class MainWindowActions {
 		// Show the dialog and handle the open operation only if approved.
 		if (dialog.showOpenDialog(window.frmPartcat) == JFileChooser.APPROVE_OPTION) {
 			component.getImage().setPath(dialog.getSelectedFile().toPath());
+			window.setComponentImageLabel(component);
 			window.setUnsavedChanges(true);
 		}
 	}

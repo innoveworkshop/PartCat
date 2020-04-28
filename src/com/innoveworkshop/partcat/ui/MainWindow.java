@@ -80,6 +80,9 @@ public class MainWindow {
 	public JButton btnDatasheet;
 	public JButton btnModel;
 	public JButton btnExtras;
+	
+	// TODO: Listen for properties table changes and change the component image if a package is defined.
+	// TODO: Implement a popup menu for the image to be able to delete it.
 
 	/**
 	 * Creates the main frame.
@@ -143,7 +146,7 @@ public class MainWindow {
 	}
 	
 	/**
-	 * Syncs the component changes in the UI to the component object.
+	 * Syncs the component changes in the UI to the {@link Component} object.
 	 */
 	public void syncComponentChanges() {
 		current_component.setQuantity((Integer)spnQuantity.getValue());
@@ -159,7 +162,7 @@ public class MainWindow {
 	}
 	
 	/**
-	 * Populates the view/edit area with data from a given component.
+	 * Populates the view/edit area with data from a given {@link Component}.
 	 * 
 	 * @param component Component to be shown/edited.
 	 */
@@ -171,13 +174,7 @@ public class MainWindow {
 		tblProperties.setEnabled(true);
 		
 		// Set image.
-		if (component.getImage().getIcon() == null) {
-			lblImage.setText("No Image");
-			lblImage.setIcon(null);
-		} else {
-			lblImage.setText("");
-			lblImage.setIcon(component.getImage().getIcon(lblImage.getSize(), true));
-		}
+		setComponentImageLabel(component);
 		
 		// Set text items.
 		txtName.setText(component.getName());
@@ -205,8 +202,7 @@ public class MainWindow {
 	 */
 	protected void clearComponentView() {
 		// Image controls.
-		lblImage.setText("No Image");
-		lblImage.setIcon(null);
+		setComponentImageLabel(null);
 		
 		// Text controls.
 		txtName.setText("");
@@ -238,7 +234,8 @@ public class MainWindow {
 	}
 	
 	/**
-	 * Sets the contents of the properties table using a HashMap of Strings.
+	 * Sets the contents of the properties table using a {@link HashMap} of
+	 * {@link String}s.
 	 * 
 	 * @param map HashMap with strings to populate the table with.
 	 */
@@ -264,13 +261,35 @@ public class MainWindow {
 	/**
 	 * Sets the current shown component in the view.
 	 * 
-	 * @param component Component to be shown/edited.
+	 * @param component {@link Component} to be shown/edited.
 	 */
 	public void setCurrentComponent(Component component) {
 		current_component = component;
 		
 		showComponent(current_component);
 		setUnsavedChanges(false);
+	}
+	
+	/**
+	 * Sets the component image label accordingly.
+	 * 
+	 * @param component {@link Component} to be used to set the image from. This
+	 *                  can be null if you don't have any.
+	 */
+	public void setComponentImageLabel(Component component) {
+		if (component == null) {
+			lblImage.setText("No Image");
+			lblImage.setIcon(null);
+			return;
+		}
+		
+		if (component.getImage().getIcon() == null) {
+			lblImage.setText("No Image");
+			lblImage.setIcon(null);
+		} else {
+			lblImage.setText("");
+			lblImage.setIcon(component.getImage().getIcon(lblImage.getSize(), true));
+		}
 	}
 	
 	/**

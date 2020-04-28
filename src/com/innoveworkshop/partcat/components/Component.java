@@ -116,9 +116,9 @@ public class Component {
 				image_name.trim();
 				
 				image = new ComponentImage(workspace, image_name);
-			} else if (prop.containsKey("Package")) {
+			} else if (getPackage() != null) {
 				// Load image based on device package.
-				image = new ComponentImage(workspace, prop.get("Package"), true);
+				image = new ComponentImage(workspace, getPackage(), true);
 			}
 		} catch (Exception e) {
 			// Fallback to a default image.
@@ -256,7 +256,6 @@ public class Component {
 	 * @return Component image name or NULL if there isn't one associated.
 	 */
 	public ComponentImage getImage() {
-		// TODO: Use "case image" if there's a case property defined.
 		return image;
 	}
 	
@@ -360,6 +359,24 @@ public class Component {
 	 */
 	public boolean isDeleted() {
 		return this.deleted;
+	}
+	
+	/**
+	 * Gets the component category if it has one.
+	 * 
+	 * @return Component category or null if it's not defined.
+	 */
+	public String getCategory() {
+		return prop.get("Category");
+	}
+	
+	/**
+	 * Gets the device package if it has one.
+	 * 
+	 * @return Device package or null if it's not defined.
+	 */
+	public String getPackage() {
+		return prop.get("Package");
 	}
 
 	/**
