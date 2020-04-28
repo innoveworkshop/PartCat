@@ -208,6 +208,7 @@ public class Component {
 	private void loadImage() {
 		try {
 			Path image_path = path.resolve(PartCatConstants.IMAGE_FILE);
+			
 			if (image_path.toFile().exists()) {
 				// Get image name from image declaration file.
 				String image_name = FileUtilities.slurpFile(image_path);
@@ -217,6 +218,9 @@ public class Component {
 			} else if (getPackage() != null) {
 				// Load image based on device package.
 				image = new ComponentImage(workspace, getPackage(), true);
+			} else {
+				// Fallback to a default image.
+				image = new ComponentImage(workspace);
 			}
 		} catch (Exception e) {
 			// Fallback to a default image.
@@ -277,7 +281,7 @@ public class Component {
 		}
 		
 		// Reload the images.
-		loadImage();
+		reloadImage();
 	}
 	
 	/**

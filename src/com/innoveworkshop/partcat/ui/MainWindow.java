@@ -41,6 +41,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.table.DefaultTableModel;
@@ -68,6 +70,7 @@ public class MainWindow {
 	public MainWindowActions action;
 	public PartCatWorkspace workspace;
 	public Component current_component;
+	public PropertiesTableModelListener tblModelListener;
 	
 	public JFrame frmPartcat;
 	public JTree treeComponents;
@@ -80,8 +83,6 @@ public class MainWindow {
 	public JButton btnDatasheet;
 	public JButton btnModel;
 	public JButton btnExtras;
-	
-	// TODO: Listen for properties table changes and change the component image if a package is defined.
 
 	/**
 	 * Creates the main frame.
@@ -190,7 +191,7 @@ public class MainWindow {
 		btnExtras.setEnabled(true);
 		
 		// Populate the table with data.
-		this.setPropertiesTableContents(component.getProperties());
+		setPropertiesTableContents(component.getProperties());
 		
 		// Clear dirtiness.
 		setUnsavedChanges(false);
@@ -217,7 +218,7 @@ public class MainWindow {
 		btnExtras.setEnabled(false);
 		
 		// Table.
-		this.clearPropertiesTable();
+		clearPropertiesTable();
 		tblProperties.setEnabled(false);
 		
 		// Component.
@@ -241,12 +242,17 @@ public class MainWindow {
 	protected void setPropertiesTableContents(HashMap<String, String> map) {
 		// Get the table model and clear it.
 		DefaultTableModel model = (DefaultTableModel)tblProperties.getModel();
+		model.removeTableModelListener(tblModelListener);
 		this.clearPropertiesTable();
 		
 		// Go through the HashMap.
 		for (Map.Entry<String, String> entry : map.entrySet()) {
 			model.addRow(new Object[] { entry.getKey(), entry.getValue() });
 		}
+		
+		// Add event listener.
+		tblModelListener = new PropertiesTableModelListener();
+		model.addTableModelListener(tblModelListener);
 	}
 	
 	/**
@@ -282,6 +288,7 @@ public class MainWindow {
 			return;
 		}
 		
+		System.out.println(component.getImage().getIcon());
 		if (component.getImage().getIcon() == null) {
 			lblImage.setText("No Image");
 			lblImage.setIcon(null);
@@ -932,6 +939,27 @@ public class MainWindow {
 		public void mouseClicked(MouseEvent e) {
 			if ((e.getClickCount() == 2) && (current_component != null)) {
 				action.selectComponentImage(current_component);
+			}
+		}
+	}
+	
+	/**
+	 * A simple class to handle all the properties table change events.
+	 */
+	class PropertiesTableModelListener implements TableModelListener {
+		public void tableChanged(TableModelEvent e) {
+			// Get the changed row contents.
+			DefaultTableModel model = (DefaultTableModel)e.getSource();
+			
+			if (model.getRowCount() > 0) {
+				String row_key = (String)model.getValueAt(e.getFirstRow(), 0);
+			
+				if (row_key.equals("Package")) {
+					// We are dealing with a package change.
+					syncComponentChanges();
+					current_component.reloadImage();
+					setComponentImageLabel(current_component);
+				}
 			}
 		}
 	}
