@@ -472,6 +472,17 @@ public class MainWindow {
 				action.openWorkspace();
 			}
 		});
+		
+		JMenuItem mntmNewWorkspace = new JMenuItem("New Workspace...");
+		mntmNewWorkspace.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (handleUnsavedChanges())
+					return;
+				
+				action.createWorkspace();
+			}
+		});
+		mnFile.add(mntmNewWorkspace);
 		mntmOpenWorkspace.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_MASK));
 		mnFile.add(mntmOpenWorkspace);
 		
@@ -651,7 +662,7 @@ public class MainWindow {
 		btnExtras.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (currentComponent != null)
-					action.openComponentFolder();
+					  action.openComponentFolder();
 			}
 		});
 		extrasPanel.add(btnExtras);

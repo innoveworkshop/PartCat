@@ -4,6 +4,7 @@ import java.awt.Desktop;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -134,6 +135,30 @@ public class MainWindowActions {
 					"Error Opening Datasheet", JOptionPane.ERROR_MESSAGE);
 		}
 	}
+	/**
+	 * Creates a new workspace from scratch using a dialog.
+	 */
+	public void createWorkspace() {
+		// Setup the file chooser.
+		JFileChooser dialog = new JFileChooser();
+		dialog.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		dialog.setDialogTitle("Create Workspace Root Folder");
+		
+		// Show the dialog and handle the create operation only if approved.
+		if (dialog.showDialog(window.frmPartcat, "Select Workspace Root") == JFileChooser.APPROVE_OPTION) {
+			try {
+				Path path = Paths.get(dialog.getSelectedFile().getPath());
+				PartCatWorkspace workspace = PartCatWorkspace.createNew(path);
+				
+				openWorkspace(workspace);
+			} catch (IOException e) {
+				e.printStackTrace();
+				JOptionPane.showMessageDialog(window.frmPartcat,
+						"Something went wrong while trying to create the workspace.",
+						"Problems Creating Workspace", JOptionPane.ERROR_MESSAGE);
+			}
+		}
+	}
 	
 	/**
 	 * Open a new workspace using a dialog.
@@ -148,7 +173,7 @@ public class MainWindowActions {
 		if (dialog.showDialog(window.frmPartcat, "Open Workspace") == JFileChooser.APPROVE_OPTION) {
 			try {
 				PartCatWorkspace workspace = new PartCatWorkspace(dialog.getSelectedFile().getPath());
-				this.openWorkspace(workspace);
+				openWorkspace(workspace);
 			} catch (WorkspaceNotFoundException e) {
 				e.printStackTrace();
 				JOptionPane.showMessageDialog(window.frmPartcat,

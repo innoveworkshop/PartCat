@@ -1,6 +1,7 @@
 package com.innoveworkshop.partcat;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -104,13 +105,29 @@ public class PartCatWorkspace {
 	}
 	
 	/**
-	 * Creates a workspace folder and populates it with the structure required.
+	 * Populates a folder with the structure required to be a workspace.
 	 * 
-	 * @param root Path to the root where the workspace folder will be created in.
-	 * @param name Name of the workspace folder that will be created.
+	 * @param  root Path to the root folder where the workspace will live in.
+	 * @return      An opened, recently created, workspace.
+	 * 
+	 * @throws IOException If something goes wrong while trying to create the
+	 *                     folder structure of the workspace.
 	 */
-	public static void createNew(Path root, String name) {
-		// TODO: Create a whole new workspace folder structure from scratch for the user.
+	public static PartCatWorkspace createNew(Path root) throws IOException {
+		// Create the components stuff.
+		Files.createDirectories(root.resolve(PartCatConstants.COMPONENTS_ROOT));
+		
+		// Create the assets stuff.
+		Path assets = root.resolve(PartCatConstants.ASSETS_ROOT);
+		Files.createDirectories(assets);
+		Files.createDirectories(assets.resolve(PartCatConstants.IMAGES_DIR));
+		
+		try {
+			return new PartCatWorkspace(root);
+		} catch (WorkspaceNotFoundException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	/**
