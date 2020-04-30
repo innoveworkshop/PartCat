@@ -403,16 +403,6 @@ public class Component {
 	}
 	
 	/**
-	 * Checks if a component has a SPICE model file associated with it.
-	 * 
-	 * @return True if the component has a SPICE model file available.
-	 */
-	public boolean hasSPICEModel() {
-		// TODO: Implement SPICE model stuff.
-		return path.resolve(PartCatConstants.SPICE_MODEL_FILE).toFile().exists();
-	}
-	
-	/**
 	 * Checks if a component has been newly created and hasn't been saved yet.
 	 * 
 	 * @return True if the component only exists in memory.

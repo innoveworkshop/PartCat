@@ -11,7 +11,6 @@ public final class PartCatConstants {
 	public static final String QUANTITY_FILE    = "QUANTITY";
 	public static final String IMAGE_FILE       = "IMAGE";
 	public static final String DATASHEET_FILE   = "datasheet.pdf";
-	public static final String SPICE_MODEL_FILE = "model.mod";
 	public static final String NOTES_FILE       = "notes.txt";
 	
 	// Root paths.

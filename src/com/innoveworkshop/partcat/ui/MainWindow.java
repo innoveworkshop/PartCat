@@ -78,7 +78,6 @@ public class MainWindow {
 	public JTextArea txtNotes;
 	public JTable tblProperties;
 	public JButton btnDatasheet;
-	public JButton btnModel;
 	public JButton btnExtras;
 
 	/**
@@ -647,9 +646,6 @@ public class MainWindow {
 		btnDatasheet = new JButton("Datasheet");
 		btnDatasheet.addMouseListener(new DatasheetPopupListener(this));
 		extrasPanel.add(btnDatasheet);
-		
-		btnModel = new JButton("Model");
-		extrasPanel.add(btnModel);
 		
 		btnExtras = new JButton("Extras");
 		extrasPanel.add(btnExtras);
