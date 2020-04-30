@@ -1,5 +1,6 @@
 package com.innoveworkshop.partcat.ui;
 
+import java.awt.Desktop;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -108,6 +109,29 @@ public class MainWindowActions {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+		}
+	}
+	
+	/**
+	 * Open the component folder.
+	 */
+	public void openComponentFolder() {
+		// Check for desktop support.
+		if (!Desktop.isDesktopSupported()) {
+			JOptionPane.showMessageDialog(window.frmPartcat,
+					"Unable to use the Desktop class for opening files.",
+					"Java Support Error", JOptionPane.WARNING_MESSAGE);
+			return;
+		}
+
+		// Open the folder.
+		try {
+			Desktop.getDesktop().open(window.currentComponent.getPath().toFile());
+		} catch (IOException e1) {
+			e1.printStackTrace();
+			JOptionPane.showMessageDialog(window.frmPartcat,
+					"An error occured while trying to open the component folder using the default application.",
+					"Error Opening Datasheet", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 	

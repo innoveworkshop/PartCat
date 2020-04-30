@@ -648,6 +648,12 @@ public class MainWindow {
 		extrasPanel.add(btnDatasheet);
 		
 		btnExtras = new JButton("Extras");
+		btnExtras.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (currentComponent != null)
+					action.openComponentFolder();
+			}
+		});
 		extrasPanel.add(btnExtras);
 		
 		JScrollPane sclNotes = new JScrollPane();
