@@ -52,21 +52,20 @@ public class PropertiesMousePopupListener extends MouseAdapter {
 		popupMenu.add(menuItem);
 		
 		// Remove property item.
-		if (showDelete) {
-			menuItem = new JMenuItem("Remove");
-			menuItem.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					int option = JOptionPane.showConfirmDialog(window.frmPartcat,
-							"Are you sure you want to delete this row?",
-							"Delete Parameter", JOptionPane.YES_NO_OPTION,
-							JOptionPane.WARNING_MESSAGE);
-					
-					if (option == JOptionPane.YES_OPTION)
-						removeTableRow();
-				}
-			});
-			popupMenu.add(menuItem);
-		}
+		menuItem = new JMenuItem("Remove");
+		menuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int option = JOptionPane.showConfirmDialog(window.frmPartcat,
+						"Are you sure you want to delete this row?",
+						"Delete Parameter", JOptionPane.YES_NO_OPTION,
+						JOptionPane.WARNING_MESSAGE);
+				
+				if (option == JOptionPane.YES_OPTION)
+					removeTableRow();
+			}
+		});
+		menuItem.setEnabled(showDelete);
+		popupMenu.add(menuItem);
 	}
 	
 	@Override

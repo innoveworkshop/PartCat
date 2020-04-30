@@ -2,8 +2,11 @@ package com.innoveworkshop.partcat.components;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.Map;
 
 import com.innoveworkshop.partcat.PartCatConstants;
@@ -360,12 +363,43 @@ public class Component {
 	}
 	
 	/**
+	 * Downloads a datasheet PDF from the internet and overwrites the file in
+	 * the component folder.
+	 * 
+	 * @param url {@link URL} to a PDF datasheet.
+	 * 
+	 * @throws IOException If something went wrong when downloading.
+	 */
+	public void downloadDatasheet(URL url) throws IOException {
+		InputStream in = url.openStream();
+		Files.copy(in, getDatasheet(), StandardCopyOption.REPLACE_EXISTING);
+	}
+	
+	/**
+	 * Deletes the datasheet from the component folder.
+	 * 
+	 * @throws IOException If a problem occurred while deleting the file.
+	 */
+	public void removeDatasheet() throws IOException {
+		Files.delete(getDatasheet());
+	}
+	
+	/**
+	 * Gets the datasheet file {@link Path} for opening.
+	 * 
+	 * @return The datasheet file {@link Path}.
+	 */
+	public Path getDatasheet() {
+		return path.resolve(PartCatConstants.DATASHEET_FILE);
+	}
+	
+	/**
 	 * Checks if a component has a datasheet file associated with it.
 	 * 
 	 * @return True if the component has a datasheet file available.
 	 */
 	public boolean hasDatasheet() {
-		return path.resolve(PartCatConstants.DATASHEET_FILE).toFile().exists();
+		return getDatasheet().toFile().exists();
 	}
 	
 	/**
@@ -374,6 +408,7 @@ public class Component {
 	 * @return True if the component has a SPICE model file available.
 	 */
 	public boolean hasSPICEModel() {
+		// TODO: Implement SPICE model stuff.
 		return path.resolve(PartCatConstants.SPICE_MODEL_FILE).toFile().exists();
 	}
 	

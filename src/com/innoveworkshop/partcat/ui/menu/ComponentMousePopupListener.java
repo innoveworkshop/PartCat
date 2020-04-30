@@ -1,9 +1,3 @@
-/**
- * ComponentMousePopupListener.java
- * 
- *
- * @author nathan
- */
 package com.innoveworkshop.partcat.ui.menu;
 
 import java.awt.event.ActionEvent;

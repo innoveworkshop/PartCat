@@ -51,6 +51,7 @@ import com.innoveworkshop.partcat.PartCatWorkspace;
 import com.innoveworkshop.partcat.components.Component;
 import com.innoveworkshop.partcat.components.ComponentProperties;
 import com.innoveworkshop.partcat.ui.menu.ComponentMousePopupListener;
+import com.innoveworkshop.partcat.ui.menu.DatasheetPopupListener;
 import com.innoveworkshop.partcat.ui.menu.ImageMousePopupListener;
 import com.innoveworkshop.partcat.ui.menu.PropertiesMousePopupListener;
 
@@ -79,8 +80,6 @@ public class MainWindow {
 	public JButton btnDatasheet;
 	public JButton btnModel;
 	public JButton btnExtras;
-	
-	// TODO: Implement the datasheet, model and other buttons with popup menus.
 
 	/**
 	 * Creates the main frame.
@@ -239,11 +238,6 @@ public class MainWindow {
 			txtNotes.setText("");
 		}
 		
-		// Enable the buttons we have files for.
-		btnDatasheet.setEnabled(component.hasDatasheet());
-		btnModel.setEnabled(component.hasSPICEModel());
-		btnExtras.setEnabled(true);
-		
 		// Populate the table with data.
 		setPropertiesTableContents(component.getProperties());
 		
@@ -265,11 +259,6 @@ public class MainWindow {
 		spnQuantity.setEnabled(false);
 		txtNotes.setText("");
 		txtNotes.setEnabled(false);
-		
-		// Buttons.
-		btnDatasheet.setEnabled(false);
-		btnModel.setEnabled(false);
-		btnExtras.setEnabled(false);
 		
 		// Table.
 		clearPropertiesTable();
@@ -656,6 +645,7 @@ public class MainWindow {
 		extrasPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 0));
 		
 		btnDatasheet = new JButton("Datasheet");
+		btnDatasheet.addMouseListener(new DatasheetPopupListener(this));
 		extrasPanel.add(btnDatasheet);
 		
 		btnModel = new JButton("Model");

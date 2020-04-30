@@ -102,6 +102,16 @@ public class PartCatWorkspace {
 			}
 		}
 	}
+	
+	/**
+	 * Creates a workspace folder and populates it with the structure required.
+	 * 
+	 * @param root Path to the root where the workspace folder will be created in.
+	 * @param name Name of the workspace folder that will be created.
+	 */
+	public static void createNew(Path root, String name) {
+		// TODO: Create a whole new workspace folder structure from scratch for the user.
+	}
 
 	/**
 	 * Gets the path to the workspace.
