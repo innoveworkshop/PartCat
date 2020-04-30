@@ -2,13 +2,12 @@ package com.innoveworkshop.partcat.ui;
 
 import java.awt.Color;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.ListIterator;
 import java.util.Map;
@@ -22,8 +21,8 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.JSpinner;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
@@ -41,23 +40,19 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.DefaultFormatter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreePath;
 
 import com.innoveworkshop.partcat.PartCatWorkspace;
 import com.innoveworkshop.partcat.components.Component;
 import com.innoveworkshop.partcat.components.ComponentProperties;
-
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import javax.swing.JSeparator;
+import com.innoveworkshop.partcat.ui.menu.ComponentMousePopupListener;
+import com.innoveworkshop.partcat.ui.menu.ImageMousePopupListener;
+import com.innoveworkshop.partcat.ui.menu.PropertiesMousePopupListener;
 
 /**
  * Our main window class.
@@ -124,6 +119,31 @@ public class MainWindow {
 	public MainWindow(PartCatWorkspace workspace) {
 		this();
 		setWorkspace(workspace);
+	}
+	
+	/**
+	 * Event fired whenever the selection of the component tree view changes.
+	 * 
+	 * @param event Tree selection event.
+	 */
+	public void componentTreeValueChanged(TreeSelectionEvent event) {
+		Object node = event.getPath().getLastPathComponent();
+		
+		// Check for unsaved changes and go to the previous selection if aborted.
+		if (handleUnsavedChanges()) {
+			ignoreUnsaved = true;
+			treeComponents.setSelectionPath(event.getOldLeadSelectionPath());
+			return;
+		}
+		
+		ignoreUnsaved = false;
+		if (node instanceof ComponentTreeNode) {
+			// Node is a component.
+			setCurrentComponent(((ComponentTreeNode)node).getComponent());
+		} else {
+			// Nope, not a component, so clear out.
+			clearComponentView();
+		}
 	}
 	
 	/**
@@ -285,7 +305,7 @@ public class MainWindow {
 		}
 		
 		// Add event listener.
-		tblModelListener = new PropertiesTableModelListener();
+		tblModelListener = new PropertiesTableModelListener(this);
 		model.addTableModelListener(tblModelListener);
 	}
 	
@@ -525,7 +545,7 @@ public class MainWindow {
 		leftPanel.add(sclTree);
 		
 		treeComponents = new JTree();
-		treeComponents.addMouseListener(new ComponentMousePopupListener(treeComponents));
+		treeComponents.addMouseListener(new ComponentMousePopupListener(this, treeComponents));
 		treeComponents.addTreeSelectionListener(new TreeSelectionListener() {
 			public void valueChanged(TreeSelectionEvent event) {
 				if (!ignoreUnsaved) {
@@ -568,7 +588,7 @@ public class MainWindow {
 		rightPanel.setLayout(sl_rightPanel);
 		
 		lblImage = new JLabel("Image");
-		lblImage.addMouseListener(new ImageMousePopupListener(lblImage));
+		lblImage.addMouseListener(new ImageMousePopupListener(this));
 		lblImage.setBackground(Color.GRAY);
 		sl_rightPanel.putConstraint(SpringLayout.NORTH, lblImage, 5, SpringLayout.NORTH, rightPanel);
 		sl_rightPanel.putConstraint(SpringLayout.WEST, lblImage, 5, SpringLayout.WEST, rightPanel);
@@ -690,329 +710,13 @@ public class MainWindow {
 		
 		DefaultTableModel table_model = new DefaultTableModel(new Object[][] {},
 				new String[] { "Property", "Value" });
-		sclTable.addMouseListener(new PropertiesMousePopupListener(tblProperties, false));
-		tblProperties.addMouseListener(new PropertiesMousePopupListener(tblProperties, true));
+		sclTable.addMouseListener(new PropertiesMousePopupListener(this, tblProperties, false));
+		tblProperties.addMouseListener(new PropertiesMousePopupListener(this, tblProperties, true));
 		
 		tblProperties.setCellSelectionEnabled(true);
 		tblProperties.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tblProperties.setModel(table_model);
 		tblProperties.setAutoCreateRowSorter(true);
 		sclTable.setViewportView(tblProperties);
-	}
-	
-	/**
-	 * Event fired whenever the selection of the component tree view changes.
-	 * 
-	 * @param event Tree selection event.
-	 */
-	public void componentTreeValueChanged(TreeSelectionEvent event) {
-		Object node = event.getPath().getLastPathComponent();
-		
-		// Check for unsaved changes and go to the previous selection if aborted.
-		if (handleUnsavedChanges()) {
-			ignoreUnsaved = true;
-			treeComponents.setSelectionPath(event.getOldLeadSelectionPath());
-			return;
-		}
-		
-		ignoreUnsaved = false;
-		if (node instanceof ComponentTreeNode) {
-			// Node is a component.
-			setCurrentComponent(((ComponentTreeNode)node).getComponent());
-		} else {
-			// Nope, not a component, so clear out.
-			clearComponentView();
-		}
-	}
-	
-	/**
-	 * A mouse adapter class to handle the properties table popup menu.
-	 */
-	class PropertiesMousePopupListener extends MouseAdapter {
-		private int row;
-		private boolean isOutsideTable;
-		public JTable tblTable;
-		public JPopupMenu popupMenu;
-		
-		/**
-		 * Creates the popup menu for the properties table.
-		 * 
-		 * @param table      Properties table.
-		 * @param showDelete Show the delete menu item?
-		 */
-		public PropertiesMousePopupListener(JTable table, boolean showDelete) {
-			JMenuItem menuItem;
-			
-			// Set the current state of things.
-			row = -1;
-			tblTable = table;
-			isOutsideTable = !showDelete;
-			popupMenu = new JPopupMenu();
-			
-			// Add property item.
-			menuItem = new JMenuItem("Add");
-			menuItem.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					addTableRow();
-				}
-			});
-			popupMenu.add(menuItem);
-			
-			// Remove property item.
-			if (showDelete) {
-				menuItem = new JMenuItem("Remove");
-				menuItem.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						int option = JOptionPane.showConfirmDialog(frmPartcat,
-								"Are you sure you want to delete this row?",
-								"Delete Parameter", JOptionPane.YES_NO_OPTION,
-								JOptionPane.WARNING_MESSAGE);
-						
-						if (option == JOptionPane.YES_OPTION)
-							removeTableRow();
-					}
-				});
-				popupMenu.add(menuItem);
-			}
-		}
-		
-		@Override
-		public void mousePressed(MouseEvent e) {
-			if (e.isPopupTrigger() && (currentComponent != null)) {
-				row = tblTable.rowAtPoint(e.getPoint());
-				popupMenu.show(e.getComponent(), e.getX(), e.getY());
-			}
-		}
-		
-		@Override
-		public void mouseReleased(MouseEvent e) {
-			if (e.isPopupTrigger() && (currentComponent != null)) {
-				row = tblTable.rowAtPoint(e.getPoint());
-				popupMenu.show(e.getComponent(), e.getX(), e.getY());
-			}
-		}
-
-		@Override
-		public void mouseClicked(MouseEvent e) {
-			if ((e.getClickCount() == 2) && isOutsideTable
-					&& (currentComponent != null)) {
-				addTableRow();
-			}
-		}
-		
-		/**
-		 * Adds a new blank row to the table.
-		 */
-		public void addTableRow() {
-			DefaultTableModel model = (DefaultTableModel)tblTable.getModel();
-			model.addRow(new Object[] { "", "" });
-			setUnsavedChanges(true);
-		}
-		
-		/**
-		 * Removes a specific row from the table.
-		 */
-		public void removeTableRow() {
-			DefaultTableModel model = (DefaultTableModel)tblTable.getModel();
-			model.removeRow(row);
-			setUnsavedChanges(true);
-		}
-	}
-	
-	/**
-	 * A mouse adapter class to handle the component list popup menu.
-	 */
-	class ComponentMousePopupListener extends MouseAdapter {
-		public JTree treeView;
-		public JPopupMenu popupMenu;
-		public JMenuItem mitmDelete;
-		public Component selComponent;
-		
-		/**
-		 * Creates the popup menu for the component list.
-		 * 
-		 * @param treeView Components tree view.
-		 */
-		public ComponentMousePopupListener(JTree treeView) {
-			// Set the current state of things.
-			this.treeView = treeView;
-			popupMenu = new JPopupMenu();
-			selComponent = null;
-			
-			// New component item.
-			JMenuItem menuItem = new JMenuItem("New");
-			menuItem.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					if (handleUnsavedChanges())
-						return;
-					
-					action.newComponent();
-				}
-			});
-			popupMenu.add(menuItem);
-			
-			// Delete component item.
-			mitmDelete = new JMenuItem("Delete");
-			mitmDelete.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					if (handleUnsavedChanges())
-						return;
-					
-					int option = JOptionPane.showConfirmDialog(frmPartcat,
-							"Are you sure you want to delete " + selComponent.getName() + "?",
-							"Delete Component", JOptionPane.YES_NO_OPTION,
-							JOptionPane.WARNING_MESSAGE);
-					
-					if (option == JOptionPane.YES_OPTION) {
-						try {
-							selComponent.delete();
-						} catch (IOException e1) {
-							e1.printStackTrace();
-							JOptionPane.showMessageDialog(frmPartcat,
-									"Something went wrong while trying to delete " + selComponent.getName(),
-									"Deletion Error", JOptionPane.ERROR_MESSAGE);
-						}
-						
-						// Clear everything and reload the tree view.
-						clearComponentTreeAndView();
-						populateComponentsTree(workspace.componentIterator());
-					}
-				}
-			});
-			popupMenu.add(mitmDelete);
-		}
-		
-		@Override
-		public void mousePressed(MouseEvent e) {
-			if (e.isPopupTrigger() && workspace.isOpen()) {
-				enableDeleteMenu(getComponentFromPosition(e.getX(), e.getY()));
-				popupMenu.show(e.getComponent(), e.getX(), e.getY());
-			}
-		}
-		
-		@Override
-		public void mouseReleased(MouseEvent e) {
-			if (e.isPopupTrigger() && workspace.isOpen()) {
-				enableDeleteMenu(getComponentFromPosition(e.getX(), e.getY()));
-				popupMenu.show(e.getComponent(), e.getX(), e.getY());
-			}
-		}
-		
-		/**
-		 * Retrieves the component object from a tree view by using the mouse
-		 * position.
-		 * 
-		 * @param  x Mouse X position.
-		 * @param  y Mouse Y position.
-		 * @return   True if we are hovering a component.
-		 */
-		public boolean getComponentFromPosition(int x, int y) {
-			TreePath treePath = treeView.getPathForLocation(x, y);
-			if (treePath == null)
-				return false;
-			
-			Object node = treePath.getLastPathComponent();
-			if (node instanceof ComponentTreeNode) {
-				selComponent = ((ComponentTreeNode)node).getComponent();
-				return true;
-			}
-			
-			selComponent = null;
-			return false;
-		}
-		
-		/**
-		 * Manages if we should enable or disable the delete item.
-		 * 
-		 * @param enable Should we enable the menu item?
-		 */
-		private void enableDeleteMenu(boolean enable) {
-			mitmDelete.setEnabled(enable);
-		}
-	}
-	
-	/**
-	 * A mouse adapter class to handle the image popup menu.
-	 */
-	class ImageMousePopupListener extends MouseAdapter {
-		public JLabel label;
-		public JPopupMenu popupMenu;
-		
-		/**
-		 * Creates the popup menu for the component image label.
-		 * 
-		 * @param label Component image {@link JLabel}.
-		 */
-		public ImageMousePopupListener(JLabel label) {
-			JMenuItem menuItem;
-			
-			// Set the current state of things.
-			this.label = label;
-			popupMenu = new JPopupMenu();
-			
-			// Add image item.
-			menuItem = new JMenuItem("Add");
-			menuItem.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					action.selectComponentImage(currentComponent);
-				}
-			});
-			popupMenu.add(menuItem);
-			
-			// Remove image item.
-			menuItem = new JMenuItem("Remove");
-			menuItem.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					currentComponent.removeImage();
-					setComponentImageLabel(currentComponent);
-					setUnsavedChanges(true);
-				}
-			});
-			popupMenu.add(menuItem);
-		}
-		
-		@Override
-		public void mousePressed(MouseEvent e) {
-			if (e.isPopupTrigger() && (currentComponent != null)) {
-				popupMenu.show(e.getComponent(), e.getX(), e.getY());
-			}
-		}
-		
-		@Override
-		public void mouseReleased(MouseEvent e) {
-			if (e.isPopupTrigger() && (currentComponent != null)) {
-				popupMenu.show(e.getComponent(), e.getX(), e.getY());
-			}
-		}
-		
-		@Override
-		public void mouseClicked(MouseEvent e) {
-			if ((e.getClickCount() == 2) && (currentComponent != null)) {
-				action.selectComponentImage(currentComponent);
-			}
-		}
-	}
-	
-	/**
-	 * A simple class to handle all the properties table change events.
-	 */
-	class PropertiesTableModelListener implements TableModelListener {
-		public void tableChanged(TableModelEvent e) {
-			// Get the changed row contents.
-			DefaultTableModel model = (DefaultTableModel)e.getSource();
-			
-			if (model.getRowCount() > 0) {
-				String row_key = (String)model.getValueAt(e.getFirstRow(), 0);
-			
-				if (row_key.equals("Package")) {
-					// We are dealing with a package change.
-					syncComponentChanges();
-					currentComponent.reloadImage();
-					setComponentImageLabel(currentComponent);
-				}
-			}
-			
-			setUnsavedChanges(true);
-		}
 	}
 }
