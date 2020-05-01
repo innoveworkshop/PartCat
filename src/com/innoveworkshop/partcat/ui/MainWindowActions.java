@@ -191,10 +191,11 @@ public class MainWindowActions {
 	 * @param workspace Workspace to open in the window.
 	 */
 	public void openWorkspace(PartCatWorkspace workspace) {
-		this.closeWorkspace();
+		closeWorkspace();
 		window.setWorkspace(workspace);
 		window.populateComponentsTree(workspace.componentIterator());
 		window.setUnsavedChanges(false);
+		window.setLastOpenedWorkspace(workspace);
 	}
 	
 	/**
@@ -204,8 +205,8 @@ public class MainWindowActions {
 		try {
 			Path path = window.workspace.getPath();
 			
-			this.closeWorkspace();
-			this.openWorkspace(new PartCatWorkspace(path));
+			closeWorkspace();
+			openWorkspace(new PartCatWorkspace(path));
 		} catch (WorkspaceNotFoundException e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(window.frmPartcat,
@@ -220,7 +221,9 @@ public class MainWindowActions {
 	public void closeWorkspace() {
 		window.setUnsavedChanges(false);
 		window.clearComponentTreeAndView();
-		window.workspace.close();
+		
+		if (window.workspace != null)
+			window.workspace.close();
 	}
 	
 	/**

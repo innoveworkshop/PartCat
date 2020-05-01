@@ -11,6 +11,7 @@ import java.awt.event.WindowEvent;
 import java.util.HashMap;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.prefs.Preferences;
 
 import javax.swing.JButton;
 import javax.swing.JFormattedTextField;
@@ -47,6 +48,7 @@ import javax.swing.text.DefaultFormatter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
+import com.innoveworkshop.partcat.PartCatConstants;
 import com.innoveworkshop.partcat.PartCatWorkspace;
 import com.innoveworkshop.partcat.components.Component;
 import com.innoveworkshop.partcat.components.ComponentProperties;
@@ -61,6 +63,7 @@ import com.innoveworkshop.partcat.ui.menu.PropertiesMousePopupListener;
  * @author Nathan Campos <nathan@innoveworkshop.com>
  */
 public class MainWindow {
+	private Preferences prefs;
 	private boolean unsavedChanges;
 	private boolean ignoreUnsaved;
 	
@@ -105,8 +108,18 @@ public class MainWindow {
 		
 		// Initialize the UI controls.
 		initializeUIControls();
-		clearComponentView();
+		clearComponentTreeAndView();
 		setUnsavedChanges(false);
+	}
+	
+	/**
+	 * Creates the main window frame with {@link Preferences}.
+	 * 
+	 * @param prefs Our {@link Preferences} object.
+	 */
+	public MainWindow(Preferences prefs) {
+		this();
+		this.prefs = prefs;
 	}
 
 	/**
@@ -349,6 +362,23 @@ public class MainWindow {
 	}
 	
 	/**
+	 * Sets the last opened workspace preference variable.
+	 * 
+	 * @param workspace Last opened PartCat workspace.
+	 */
+	public void setLastOpenedWorkspace(PartCatWorkspace workspace) {
+		prefs.put(PartCatConstants.LAST_OPENED_WORKSPACE_KEY,
+				workspace.getPath().toString());
+	}
+	
+	/**
+	 * Clears the last opened workspace preferences variable.
+	 */
+	public void clearLastOpenedWorkspace() {
+		prefs.remove(PartCatConstants.LAST_OPENED_WORKSPACE_KEY);
+	}
+	
+	/**
 	 * Takes care of showing a dialog for unsaved changes and what should be
 	 * done with the user decision.
 	 * 
@@ -505,6 +535,7 @@ public class MainWindow {
 					return;
 				
 				action.closeWorkspace();
+				clearLastOpenedWorkspace();
 			}
 		});
 		mntmCloseWorkspace.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.CTRL_MASK));

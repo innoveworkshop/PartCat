@@ -19,4 +19,7 @@ public final class PartCatConstants {
 	
 	// Sub folders paths.
 	public static final String IMAGES_DIR = "images";
+	
+	// Preferences keys.
+	public static final String LAST_OPENED_WORKSPACE_KEY = "LastOpenedWorkspace";
 }
