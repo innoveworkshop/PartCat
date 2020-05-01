@@ -74,6 +74,8 @@ public class MainWindow {
 	public Component currentComponent;
 	public PropertiesTableModelListener tblModelListener;
 	
+
+	public AboutDialog dlgAbout;
 	public JFrame frmPartcat;
 	public JTree treeComponents;
 	public JTextField txtFilter;
@@ -461,6 +463,8 @@ public class MainWindow {
 			}
 		});
 		
+		dlgAbout = new AboutDialog();
+		
 		JMenuBar menuBar = new JMenuBar();
 		frmPartcat.setJMenuBar(menuBar);
 		
@@ -562,7 +566,11 @@ public class MainWindow {
 		menuBar.add(mnHelp);
 		
 		JMenuItem mntmAbout = new JMenuItem("About...");
-		mntmAbout.setEnabled(false);
+		mntmAbout.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				dlgAbout.setVisible(true);
+			}
+		});
 		mnHelp.add(mntmAbout);
 		SpringLayout springLayout = new SpringLayout();
 		frmPartcat.getContentPane().setLayout(springLayout);
