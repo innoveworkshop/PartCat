@@ -237,6 +237,8 @@ public class MainWindow {
 		spnQuantity.setEnabled(true);
 		txtNotes.setEnabled(true);
 		tblProperties.setEnabled(true);
+		btnDatasheet.setEnabled(true);
+		btnExtras.setEnabled(true);
 		
 		// Set image.
 		setComponentImageLabel(component);
@@ -275,6 +277,10 @@ public class MainWindow {
 		// Table.
 		clearPropertiesTable();
 		tblProperties.setEnabled(false);
+		
+		// Buttons.
+		btnDatasheet.setEnabled(false);
+		btnExtras.setEnabled(false);
 		
 		// Component.
 		currentComponent = null;
@@ -686,10 +692,12 @@ public class MainWindow {
 		extrasPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 0));
 		
 		btnDatasheet = new JButton("Datasheet");
+		btnDatasheet.setEnabled(false);
 		btnDatasheet.addMouseListener(new DatasheetPopupListener(this));
 		extrasPanel.add(btnDatasheet);
 		
 		btnExtras = new JButton("Extras");
+		btnExtras.setEnabled(false);
 		btnExtras.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (currentComponent != null)
