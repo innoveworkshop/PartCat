@@ -52,6 +52,7 @@ import com.innoveworkshop.partcat.PartCatConstants;
 import com.innoveworkshop.partcat.PartCatWorkspace;
 import com.innoveworkshop.partcat.components.Component;
 import com.innoveworkshop.partcat.components.ComponentProperties;
+import com.innoveworkshop.partcat.resources.ApplicationResources;
 import com.innoveworkshop.partcat.ui.menu.ComponentMousePopupListener;
 import com.innoveworkshop.partcat.ui.menu.DatasheetPopupListener;
 import com.innoveworkshop.partcat.ui.menu.ImageMousePopupListener;
@@ -63,6 +64,7 @@ import com.innoveworkshop.partcat.ui.menu.PropertiesMousePopupListener;
  * @author Nathan Campos <nathan@innoveworkshop.com>
  */
 public class MainWindow {
+	private ApplicationResources res;
 	private Preferences prefs;
 	private boolean unsavedChanges;
 	private boolean ignoreUnsaved;
@@ -115,11 +117,15 @@ public class MainWindow {
 	/**
 	 * Creates the main window frame with {@link Preferences}.
 	 * 
+	 * @param res   Application resources.
 	 * @param prefs Our {@link Preferences} object.
 	 */
-	public MainWindow(Preferences prefs) {
+	public MainWindow(ApplicationResources res, Preferences prefs) {
 		this();
+		this.res = res;
 		this.prefs = prefs;
+		
+		frmPartcat.setIconImages(this.res.getApplicationIcons());
 	}
 
 	/**

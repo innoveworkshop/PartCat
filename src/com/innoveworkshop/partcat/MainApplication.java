@@ -3,6 +3,7 @@ package com.innoveworkshop.partcat;
 import java.awt.EventQueue;
 import java.util.prefs.Preferences;
 
+import com.innoveworkshop.partcat.resources.ApplicationResources;
 import com.innoveworkshop.partcat.ui.MainWindow;
 
 /**
@@ -13,6 +14,7 @@ import com.innoveworkshop.partcat.ui.MainWindow;
 public class MainApplication {
 	private static PartCatWorkspace workspace;
 	private static Preferences prefs;
+	private static ApplicationResources res;
 	
 	/**
 	 * Application's main entry point.
@@ -20,6 +22,9 @@ public class MainApplication {
 	 * @param args Command line arguments.
 	 */
 	public static void main(String[] args) throws Exception {
+		// Get resources.
+		res = new ApplicationResources();
+		
 		// Get preferences.
 		prefs = Preferences.userNodeForPackage(MainApplication.class.getClass());
 		String lastWorkspace = prefs.get(PartCatConstants.LAST_OPENED_WORKSPACE_KEY, null);
@@ -32,7 +37,7 @@ public class MainApplication {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					MainWindow window = new MainWindow(prefs);
+					MainWindow window = new MainWindow(res, prefs);
 					window.show();
 					
 					// Load last used workspace.
