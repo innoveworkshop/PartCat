@@ -11,6 +11,13 @@ its files, no databases involved. This way you can easily move your library
 around, sync it between computers, and even place your whole library inside a
 Git (or whatever you prefer) repository and manage it that way.
 
+## Installation
+
+Well, you can always just run the `PartCat.jar` file located inside `dist/`, but
+if you're running Linux you can go to the `dist/` directory and run the
+`install.sh` script there to automatically create system-wide files and make
+things easier on you.
+
 ## Requirements
 
   - Java 8

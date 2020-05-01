@@ -1,0 +1,11 @@
+#!/bin/sh
+
+### partcat
+### PartCat Java application launcher.
+###
+### Author: Nathan Campos <nathan@innoveworkshop.com>
+
+jardir="$(cd "$(dirname "$0")" && pwd)"
+
+java -jar $jardir/PartCat.jar
+
