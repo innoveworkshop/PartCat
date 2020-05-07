@@ -134,7 +134,16 @@ public class MainWindow {
 		this.res = res;
 		this.prefs = prefs;
 		
+		// Set the application icon.
 		frmPartcat.setIconImages(this.res.getApplicationIcons());
+		
+		// Get the look and feel or select the most native looking one.
+		String lookClass = prefs.get(PartCatConstants.SELECTED_LOOK_FEEL_KEY, null);
+		System.out.println(lookClass);
+		if (lookClass != null) {
+			System.out.println("WTF");
+			setLookByThemeClassName(lookClass, false);
+		}
 	}
 
 	/**
@@ -467,24 +476,12 @@ public class MainWindow {
 			mnuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					JCheckBoxMenuItem mnuItem = (JCheckBoxMenuItem)e.getSource();
-					
 					// Set the look based on its name.
-					LookAndFeelInfo looks[] = UIManager.getInstalledLookAndFeels();
-					for (LookAndFeelInfo look : looks) {
-						if (look.getName().equals(mnuItem.getText())) {
-							try {
-								UIManager.setLookAndFeel(look.getClassName());
-							} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
-									| UnsupportedLookAndFeelException e1) {
-								e1.printStackTrace();
-							}
-						}
-					}
+					JCheckBoxMenuItem mnuItem = (JCheckBoxMenuItem)e.getSource();
+					setLookByThemeName(mnuItem.getText(), true);
 					
 					// Update the appearance menu.
 					populateAppearanceMenu();
-					SwingUtilities.updateComponentTreeUI(frmPartcat);
 				}
 			});
 			
@@ -497,6 +494,43 @@ public class MainWindow {
 			
 			// Append to the parent menu.
 			mnWidgetStyle.add(mnuItem);
+		}
+	}
+	
+	/**
+	 * Sets the application Look and Feel based on the theme class name.
+	 * 
+	 * @param name    Theme class name.
+	 * @param setPref Should I set the preferences for this change?
+	 */
+	public void setLookByThemeClassName(String name, boolean setPref) {
+		try {
+			UIManager.setLookAndFeel(name);
+			SwingUtilities.updateComponentTreeUI(frmPartcat);
+			
+			if (setPref)
+				prefs.put(PartCatConstants.SELECTED_LOOK_FEEL_KEY, name);
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.err.println("Couldn't set the look and feel '" + name +
+					"' for this platform. Switching to default");
+		}
+	}
+	
+	/**
+	 * Sets the application Look and Feel based on the theme name.
+	 * 
+	 * @param name    Theme name in a "human-readable" form.
+	 * @param setPref Should I set the preferences for this change?
+	 */
+	public void setLookByThemeName(String name, boolean setPref) {
+		LookAndFeelInfo looks[] = UIManager.getInstalledLookAndFeels();
+		
+		for (LookAndFeelInfo look : looks) {
+			if (look.getName().equals(name)) {
+				// Set theme and refresh the frame.
+				setLookByThemeClassName(look.getClassName(), setPref);
+			}
 		}
 	}
 

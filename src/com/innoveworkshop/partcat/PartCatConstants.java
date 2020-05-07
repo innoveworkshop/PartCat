@@ -22,4 +22,5 @@ public final class PartCatConstants {
 	
 	// Preferences keys.
 	public static final String LAST_OPENED_WORKSPACE_KEY = "LastOpenedWorkspace";
+	public static final String SELECTED_LOOK_FEEL_KEY = "LookAndFeel";
 }
