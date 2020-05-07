@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.prefs.Preferences;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -32,11 +33,15 @@ import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
+import javax.swing.LookAndFeel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SpringLayout;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
@@ -77,6 +82,7 @@ public class MainWindow {
 
 	public AboutDialog dlgAbout;
 	public JFrame frmPartcat;
+	public JMenu mnWidgetStyle;
 	public JTree treeComponents;
 	public JTextField txtFilter;
 	public JLabel lblImage;
@@ -112,6 +118,7 @@ public class MainWindow {
 		
 		// Initialize the UI controls.
 		initializeUIControls();
+		populateAppearanceMenu();
 		clearComponentTreeAndView();
 		setUnsavedChanges(false);
 	}
@@ -442,6 +449,56 @@ public class MainWindow {
 	public void hide() {
 		frmPartcat.setVisible(false);
 	}
+	
+	/**
+	 * Populates the appearance menu with the available widget styles.
+	 */
+	public void populateAppearanceMenu() {
+		LookAndFeelInfo looks[] = UIManager.getInstalledLookAndFeels();
+		LookAndFeel currentLook = UIManager.getLookAndFeel();
+		
+		// Clear the menu.
+		mnWidgetStyle.removeAll();
+		
+		JCheckBoxMenuItem mnuItem;
+		for (LookAndFeelInfo look : looks) {
+			// Create the menu item.
+			mnuItem = new JCheckBoxMenuItem(look.getName());
+			mnuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					JCheckBoxMenuItem mnuItem = (JCheckBoxMenuItem)e.getSource();
+					
+					// Set the look based on its name.
+					LookAndFeelInfo looks[] = UIManager.getInstalledLookAndFeels();
+					for (LookAndFeelInfo look : looks) {
+						if (look.getName().equals(mnuItem.getText())) {
+							try {
+								UIManager.setLookAndFeel(look.getClassName());
+							} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+									| UnsupportedLookAndFeelException e1) {
+								e1.printStackTrace();
+							}
+						}
+					}
+					
+					// Update the appearance menu.
+					populateAppearanceMenu();
+					SwingUtilities.updateComponentTreeUI(frmPartcat);
+				}
+			});
+			
+			// Sets the currently in use look.
+			if (look.getName().equals(currentLook.getName())) {
+				mnuItem.setState(true);
+			} else {
+				mnuItem.setState(false);
+			}
+			
+			// Append to the parent menu.
+			mnWidgetStyle.add(mnuItem);
+		}
+	}
 
 	/**
 	 * Initialize the contents of the frame.
@@ -561,6 +618,12 @@ public class MainWindow {
 		mnFile.add(separator_1);
 		mntmQuit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, InputEvent.CTRL_MASK));
 		mnFile.add(mntmQuit);
+		
+		JMenu mnView = new JMenu("View");
+		menuBar.add(mnView);
+		
+		mnWidgetStyle = new JMenu("Widget Style");
+		mnView.add(mnWidgetStyle);
 		
 		JMenu mnHelp = new JMenu("Help");
 		menuBar.add(mnHelp);
