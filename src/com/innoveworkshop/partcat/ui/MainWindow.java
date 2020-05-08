@@ -132,8 +132,9 @@ public class MainWindow {
 		this.res = res;
 		this.prefs = prefs;
 		
-		// Set the application icon.
+		// Set the application icon and restore window position and sizing.
 		frmPartcat.setIconImages(this.res.getApplicationIcons());
+		restoreWindowParameters();
 		
 		// Get the look and feel or select the most native looking one.
 		String lookClass = prefs.get(PartCatConstants.SELECTED_LOOK_FEEL_KEY, null);
@@ -150,6 +151,24 @@ public class MainWindow {
 	public MainWindow(PartCatWorkspace workspace) {
 		this();
 		setWorkspace(workspace);
+	}
+	
+	/**
+	 * Restores the window parameters, position and sizing, from the preferences.
+	 */
+	public void restoreWindowParameters() {
+		if (prefs == null)
+			return;
+		
+		// Get the parameters from the preferences.
+		int x = prefs.getInt(PartCatConstants.WINDOW_POSITION_X_KEY, frmPartcat.getX());
+		int y = prefs.getInt(PartCatConstants.WINDOW_POSITION_Y_KEY, frmPartcat.getY());
+		int w = prefs.getInt(PartCatConstants.WINDOW_WIDTH_KEY, frmPartcat.getWidth());
+		int h = prefs.getInt(PartCatConstants.WINDOW_HEIGHT_KEY, frmPartcat.getHeight());
+		
+		// Set the parameters.
+		frmPartcat.setLocation(x, y);
+		frmPartcat.setSize(w, h);
 	}
 	
 	/**
@@ -599,6 +618,13 @@ public class MainWindow {
 				if (defaultUnsavedChangesBehaviour())
 					return;
 				
+				// Save the window position and sizing.
+				prefs.putInt(PartCatConstants.WINDOW_POSITION_X_KEY, frmPartcat.getX());
+				prefs.putInt(PartCatConstants.WINDOW_POSITION_Y_KEY, frmPartcat.getY());
+				prefs.putInt(PartCatConstants.WINDOW_WIDTH_KEY, frmPartcat.getWidth());
+				prefs.putInt(PartCatConstants.WINDOW_HEIGHT_KEY, frmPartcat.getHeight());
+				
+				// Actually close window and workspace.
 				action.closeWorkspace();
 				frmPartcat.dispose();
 			}
