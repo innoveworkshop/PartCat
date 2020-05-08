@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 import com.innoveworkshop.partcat.components.Component;
+import com.innoveworkshop.partcat.components.ComponentCategory;
 import com.innoveworkshop.partcat.exceptions.ComponentNotFoundException;
 import com.innoveworkshop.partcat.exceptions.WorkspaceNotFoundException;
 
@@ -184,6 +185,31 @@ public class PartCatWorkspace {
 		}
 		
 		throw new ComponentNotFoundException(name);
+	}
+	
+	/**
+	 * Gets a list of all the component categories (populated with sub-categories)
+	 * that are used in this workspace.
+	 * 
+	 * @return A list of component categories.
+	 * 
+	 * @see {@link ComponentCategory}
+	 */
+	public ArrayList<ComponentCategory> getComponentCategories() {
+		ArrayList<ComponentCategory> categories = new ArrayList<ComponentCategory>();
+		ListIterator<Component> iterComponents = componentIterator();
+		
+		// Go through components looking for unique categories.
+		while (iterComponents.hasNext()) {
+			ComponentCategory cat = iterComponents.next().getCategory();
+			
+			// Looks like a unique category so far?
+			if (!categories.contains(cat)) {
+				categories.add(cat);
+			}
+		}
+		
+		return categories;
 	}
 	
 	/**

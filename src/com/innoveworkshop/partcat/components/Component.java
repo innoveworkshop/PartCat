@@ -421,12 +421,13 @@ public class Component {
 	}
 	
 	/**
-	 * Gets the component category if it has one.
+	 * Gets the component category.
 	 * 
-	 * @return Component category or null if it's not defined.
+	 * @return Component category.
+	 * @see {@link ComponentCategory}
 	 */
-	public String getCategory() {
-		return prop.get("Category");
+	public ComponentCategory getCategory() {
+		return new ComponentCategory(prop);
 	}
 	
 	/**

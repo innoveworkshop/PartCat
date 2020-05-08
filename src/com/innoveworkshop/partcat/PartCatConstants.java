@@ -27,4 +27,8 @@ public final class PartCatConstants {
 	public static final String WINDOW_POSITION_Y_KEY = "WindowPositionY";
 	public static final String WINDOW_WIDTH_KEY = "WindowWidth";
 	public static final String WINDOW_HEIGHT_KEY = "WindowHeight";
+	
+	// Special component property keys.
+	public static final String PROPERTY_CATEGORY = "Category";
+	public static final String PROPERTY_SUBCATEGORY = "Sub-Category";
 }

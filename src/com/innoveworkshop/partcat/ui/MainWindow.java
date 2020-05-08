@@ -8,6 +8,7 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.ListIterator;
 import java.util.Map;
@@ -55,6 +56,7 @@ import javax.swing.tree.DefaultTreeModel;
 import com.innoveworkshop.partcat.PartCatConstants;
 import com.innoveworkshop.partcat.PartCatWorkspace;
 import com.innoveworkshop.partcat.components.Component;
+import com.innoveworkshop.partcat.components.ComponentCategory;
 import com.innoveworkshop.partcat.components.ComponentProperties;
 import com.innoveworkshop.partcat.resources.ApplicationResources;
 import com.innoveworkshop.partcat.ui.menu.ComponentMousePopupListener;
@@ -214,6 +216,8 @@ public class MainWindow {
 		// Create the tree root node.
 		DefaultMutableTreeNode root = new DefaultMutableTreeNode("Components");
 		
+		ArrayList<ComponentCategory> categories = workspace.getComponentCategories();
+		
 		// Go through components adding them to the tree.
 		while (iter.hasNext()) {
 			Component comp = iter.next();
@@ -232,8 +236,6 @@ public class MainWindow {
 		// Set the tree model.
 		treeComponents.setModel(new DefaultTreeModel(root));
 	}
-	
-
 	
 	/**
 	 * Populates the tree view using a components list iterator.
