@@ -204,6 +204,15 @@ public class MainWindow {
 	}
 	
 	/**
+	 * Expands all of the noeds in the component tree view.
+	 */
+	public void expandAllTreeNodes() {
+		for (int i = 0; i < treeComponents.getRowCount(); i++) {
+			treeComponents.expandRow(i);
+		}
+	}
+	
+	/**
 	 * Populates the tree view applying an optional filtering {@link String}.
 	 * 
 	 * @param filter A filtering string to be applied when populating.
@@ -240,8 +249,9 @@ public class MainWindow {
 				root.add(node);
 		}
 		
-		// Set the tree model.
+		// Set the tree model and expand all the nodes.
 		treeComponents.setModel(new DefaultTreeModel(root));
+		expandAllTreeNodes();
 	}
 	
 	/**
