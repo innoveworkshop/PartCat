@@ -91,6 +91,10 @@ public class MainWindow {
 	public JButton btnDatasheet;
 	public JButton btnExtras;
 	
+	/**
+	 * Options available from the save (unsaved) changes dialog to handle. To be used
+	 * with {@link MainWindow#handleUnsavedChanges}.
+	 */
 	public enum SaveChangesOption {
 		YES,
 		NO,
@@ -412,6 +416,7 @@ public class MainWindow {
 	 * @return Save changes option enumerator index.
 	 * 
 	 * @see {@link SaveChangesOption}
+	 * @see {@link MainWindow#defaultUnsavedChangesBehaviour}
 	 */
 	public SaveChangesOption handleUnsavedChanges() {
 		if (!hasUnsavedChanges())
@@ -436,6 +441,8 @@ public class MainWindow {
 	 * if Cancel, and continuing as normal if No.
 	 * 
 	 * @return True if the current operation should be aborted.
+	 * 
+	 * @see {@link MainWindow#handleUnsavedChanges}
 	 */
 	public boolean defaultUnsavedChangesBehaviour() {
 		SaveChangesOption handleChanges = handleUnsavedChanges();
