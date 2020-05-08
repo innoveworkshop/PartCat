@@ -45,7 +45,7 @@ public class ComponentMousePopupListener extends MouseAdapter {
 		JMenuItem menuItem = new JMenuItem("New");
 		menuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (window.handleUnsavedChanges())
+				if (window.defaultUnsavedChangesBehaviour())
 					return;
 				
 				window.action.newComponent();
@@ -57,7 +57,7 @@ public class ComponentMousePopupListener extends MouseAdapter {
 		mitmDelete = new JMenuItem("Delete");
 		mitmDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (window.handleUnsavedChanges())
+				if (window.defaultUnsavedChangesBehaviour())
 					return;
 				
 				int option = JOptionPane.showConfirmDialog(window.frmPartcat,

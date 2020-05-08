@@ -68,6 +68,12 @@ import com.innoveworkshop.partcat.ui.menu.PropertiesMousePopupListener;
  * @author Nathan Campos <nathan@innoveworkshop.com>
  */
 public class MainWindow {
+	public enum SaveChangesOption {
+		YES,
+		NO,
+		CANCEL;
+	}
+	
 	private ApplicationResources res;
 	private Preferences prefs;
 	private boolean unsavedChanges;
@@ -77,7 +83,6 @@ public class MainWindow {
 	public PartCatWorkspace workspace;
 	public Component currentComponent;
 	public PropertiesTableModelListener tblModelListener;
-	
 
 	public AboutDialog dlgAbout;
 	public JFrame frmPartcat;
@@ -151,11 +156,16 @@ public class MainWindow {
 	public void componentTreeValueChanged(TreeSelectionEvent event) {
 		Object node = event.getPath().getLastPathComponent();
 		
-		// Check for unsaved changes and go to the previous selection if aborted.
-		if (handleUnsavedChanges()) {
+		// Check for unsaved changes.
+		SaveChangesOption handleChanges = handleUnsavedChanges();
+		if (handleChanges == SaveChangesOption.CANCEL) {
+			// Return back to the previous selection and undo everything.
 			ignoreUnsaved = true;
 			treeComponents.setSelectionPath(event.getOldLeadSelectionPath());
 			return;
+		} else if (handleChanges == SaveChangesOption.YES) {
+			// Save the current component before continuing.
+			action.saveComponent(currentComponent);
 		}
 		
 		ignoreUnsaved = false;
@@ -399,19 +409,41 @@ public class MainWindow {
 	 * Takes care of showing a dialog for unsaved changes and what should be
 	 * done with the user decision.
 	 * 
-	 * @return True if the operation should be aborted because the user wants to
-	 *         save stuff first.
+	 * @return Save changes option enumerator index.
+	 * 
+	 * @see {@link SaveChangesOption}
 	 */
-	public boolean handleUnsavedChanges() {
+	public SaveChangesOption handleUnsavedChanges() {
 		if (!hasUnsavedChanges())
-			return false;
+			return SaveChangesOption.NO;
 		
 		int option = JOptionPane.showConfirmDialog(frmPartcat,
-				"You have unsaved changes. Do you wish to continue and DISCARD them?",
-				"Unsaved Changes", JOptionPane.YES_NO_CANCEL_OPTION,
-				JOptionPane.WARNING_MESSAGE);
+				"You have unsaved changes. Do you wish to save them?",
+				"Unsaved Changes", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
 		
-		return option != JOptionPane.YES_OPTION;
+		if (option == JOptionPane.YES_OPTION) {
+			return SaveChangesOption.YES;
+		} else if (option == JOptionPane.NO_OPTION) {
+			return SaveChangesOption.NO;
+		}
+		
+		return SaveChangesOption.CANCEL;
+	}
+	
+	/**
+	 * Handles the unsaved changes dialog in the default way of saving the current
+	 * component and continuing if the user chooses Yes, doing nothing and aborting
+	 * if Cancel, and continuing as normal if No.
+	 * 
+	 * @return True if the current operation should be aborted.
+	 */
+	public boolean defaultUnsavedChangesBehaviour() {
+		SaveChangesOption handleChanges = handleUnsavedChanges();
+		if (handleChanges == SaveChangesOption.YES) {
+			action.saveComponent(currentComponent);
+		}
+		
+		return (handleChanges == SaveChangesOption.CANCEL);
 	}
 	
 	/**
@@ -557,7 +589,7 @@ public class MainWindow {
 		frmPartcat.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent windowEvent) {
-				if (handleUnsavedChanges())
+				if (defaultUnsavedChangesBehaviour())
 					return;
 				
 				action.closeWorkspace();
@@ -576,7 +608,7 @@ public class MainWindow {
 		JMenuItem mntmQuit = new JMenuItem("Quit");
 		mntmQuit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (handleUnsavedChanges())
+				if (defaultUnsavedChangesBehaviour())
 					return;
 				
 				action.closeWindow();
@@ -586,7 +618,7 @@ public class MainWindow {
 		JMenuItem mntmNewComponent = new JMenuItem("New Component");
 		mntmNewComponent.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (handleUnsavedChanges())
+				if (defaultUnsavedChangesBehaviour())
 					return;
 				
 				action.newComponent();
@@ -614,7 +646,7 @@ public class MainWindow {
 		JMenuItem mntmOpenWorkspace = new JMenuItem("Open Workspace...");
 		mntmOpenWorkspace.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (handleUnsavedChanges())
+				if (defaultUnsavedChangesBehaviour())
 					return;
 				
 				action.openWorkspace();
@@ -624,7 +656,7 @@ public class MainWindow {
 		JMenuItem mntmNewWorkspace = new JMenuItem("New Workspace...");
 		mntmNewWorkspace.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (handleUnsavedChanges())
+				if (defaultUnsavedChangesBehaviour())
 					return;
 				
 				action.createWorkspace();
@@ -637,7 +669,7 @@ public class MainWindow {
 		JMenuItem mntmRefreshWorkspace = new JMenuItem("Refresh Workspace");
 		mntmRefreshWorkspace.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (handleUnsavedChanges())
+				if (defaultUnsavedChangesBehaviour())
 					return;
 				
 				action.refreshWorkspace();
@@ -649,7 +681,7 @@ public class MainWindow {
 		JMenuItem mntmCloseWorkspace = new JMenuItem("Close Workspace");
 		mntmCloseWorkspace.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (handleUnsavedChanges())
+				if (defaultUnsavedChangesBehaviour())
 					return;
 				
 				action.closeWorkspace();
