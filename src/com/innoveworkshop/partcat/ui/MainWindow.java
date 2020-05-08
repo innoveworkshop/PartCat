@@ -68,12 +68,6 @@ import com.innoveworkshop.partcat.ui.menu.PropertiesMousePopupListener;
  * @author Nathan Campos <nathan@innoveworkshop.com>
  */
 public class MainWindow {
-	public enum SaveChangesOption {
-		YES,
-		NO,
-		CANCEL;
-	}
-	
 	private ApplicationResources res;
 	private Preferences prefs;
 	private boolean unsavedChanges;
@@ -96,6 +90,12 @@ public class MainWindow {
 	public JTable tblProperties;
 	public JButton btnDatasheet;
 	public JButton btnExtras;
+	
+	public enum SaveChangesOption {
+		YES,
+		NO,
+		CANCEL;
+	}
 
 	/**
 	 * Creates the main frame.
