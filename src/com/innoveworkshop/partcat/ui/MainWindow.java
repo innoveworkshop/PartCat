@@ -41,7 +41,6 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
-import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
@@ -104,17 +103,7 @@ public class MainWindow {
 		this.action = new MainWindowActions(this);
 		
 		// Set the look and feel to be more native looking.
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (Exception e) {
-			try {
-				System.err.println("Couldn't set the correct look and feel " +
-						"for this platform. Switching to default");
-				UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-			} catch (Exception e1) {
-				e1.printStackTrace();
-			}
-		}
+		setSystemNativeLook();
 		
 		// Initialize the UI controls.
 		initializeUIControls();
@@ -139,9 +128,7 @@ public class MainWindow {
 		
 		// Get the look and feel or select the most native looking one.
 		String lookClass = prefs.get(PartCatConstants.SELECTED_LOOK_FEEL_KEY, null);
-		System.out.println(lookClass);
 		if (lookClass != null) {
-			System.out.println("WTF");
 			setLookByThemeClassName(lookClass, false);
 		}
 	}
@@ -498,6 +485,24 @@ public class MainWindow {
 	}
 	
 	/**
+	 * Sets the Swing theme to be as native as possible. This should be called before
+	 * creating the UI components.
+	 */
+	public void setSystemNativeLook() {
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (Exception e) {
+			try {
+				System.err.println("Couldn't set the correct look and feel " +
+						"for this platform. Switching to default");
+				UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+		}
+	}
+	
+	/**
 	 * Sets the application Look and Feel based on the theme class name.
 	 * 
 	 * @param name    Theme class name.
@@ -514,6 +519,12 @@ public class MainWindow {
 			e.printStackTrace();
 			System.err.println("Couldn't set the look and feel '" + name +
 					"' for this platform. Switching to default");
+			
+			try {
+				UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
 		}
 	}
 	
