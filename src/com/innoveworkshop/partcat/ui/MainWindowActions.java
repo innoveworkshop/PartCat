@@ -193,7 +193,7 @@ public class MainWindowActions {
 	public void openWorkspace(PartCatWorkspace workspace) {
 		closeWorkspace();
 		window.setWorkspace(workspace);
-		window.populateComponentsTree(workspace.componentIterator());
+		window.populateComponentsTree();
 		window.setUnsavedChanges(false);
 		window.setLastOpenedWorkspace(workspace);
 	}

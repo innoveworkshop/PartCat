@@ -77,7 +77,7 @@ public class ComponentMousePopupListener extends MouseAdapter {
 					
 					// Clear everything and reload the tree view.
 					window.clearComponentTreeAndView();
-					window.populateComponentsTree(window.workspace.componentIterator());
+					window.populateComponentsTree();
 				}
 			}
 		});

@@ -50,7 +50,7 @@ public class MainApplication {
 					// Load last used workspace.
 					if (workspace != null) {
 						window.setWorkspace(workspace);
-						window.populateComponentsTree(workspace.componentIterator());
+						window.populateComponentsTree();
 					}
 				} catch (Exception e) {
 					e.printStackTrace();

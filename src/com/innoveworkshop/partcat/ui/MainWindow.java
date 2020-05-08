@@ -204,33 +204,40 @@ public class MainWindow {
 	}
 	
 	/**
-	 * Populates the tree view using a components list iterator and a filtering
-	 * {@link String}.
+	 * Populates the tree view applying an optional filtering {@link String}.
 	 * 
-	 * @param iter   Components list iterator.
 	 * @param filter A filtering string to be applied when populating.
-	 * 
-	 * @see {@link Component#componentIterator}
 	 */
-	public void populateComponentsTree(ListIterator<Component> iter, String filter) {
+	public void populateComponentsTree(String filter) {
 		// Create the tree root node.
 		DefaultMutableTreeNode root = new DefaultMutableTreeNode("Components");
 		
-		ArrayList<ComponentCategory> categories = workspace.getComponentCategories();
-		
-		// Go through components adding them to the tree.
-		while (iter.hasNext()) {
-			Component comp = iter.next();
-			
-			// Check if we should apply any filtering.
-			if (!filter.isEmpty()) {
-				if (!comp.getName().toLowerCase().contains(filter.toLowerCase()))
-					continue;
+		// Go through the categories and adds them to the tree.
+		ListIterator<ComponentCategory> iterCategories = workspace.getComponentCategories().listIterator();
+		while (iterCategories.hasNext()) {
+			ComponentCategory cat = iterCategories.next();
+			DefaultMutableTreeNode node = new DefaultMutableTreeNode(cat.getName());
+			ArrayList<Component> components = workspace.getComponentsByCategories(cat);
+			ListIterator<Component> iterComponents = components.listIterator();
+
+			// Go through components adding them to the tree.
+			while (iterComponents.hasNext()) {
+				Component comp = iterComponents.next();
+				
+				// Check if we should apply any filtering.
+				if (!filter.isEmpty()) {
+					if (!comp.getName().toLowerCase().contains(filter.toLowerCase()))
+						continue;
+				}
+				
+				// Check if the component has been deleted before adding it.
+				if (!comp.isDeleted())
+					node.add(new ComponentTreeNode(comp));
 			}
 			
-			// Check if the component has been deleted before adding it.
-			if (!comp.isDeleted())
-				root.add(new ComponentTreeNode(comp));
+			// Add the category to the tree if it has any items.
+			if (!node.isLeaf())
+				root.add(node);
 		}
 		
 		// Set the tree model.
@@ -238,13 +245,10 @@ public class MainWindow {
 	}
 	
 	/**
-	 * Populates the tree view using a components list iterator.
-	 * 
-	 * @param iter   Components list iterator.
-	 * @see {@link Component#componentIterator}
+	 * Populates the tree view without any filtering.
 	 */
-	public void populateComponentsTree(ListIterator<Component> iter) {
-		populateComponentsTree(iter, "");
+	public void populateComponentsTree() {
+		populateComponentsTree("");
 	}
 	
 	/**
@@ -253,7 +257,7 @@ public class MainWindow {
 	 * @param filter A filtering string.
 	 */
 	public void applyTreeFiltering(String filter) {
-		populateComponentsTree(workspace.componentIterator(), filter);
+		populateComponentsTree(filter);
 	}
 	
 	/**

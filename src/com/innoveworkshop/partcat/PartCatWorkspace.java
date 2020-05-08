@@ -188,6 +188,28 @@ public class PartCatWorkspace {
 	}
 	
 	/**
+	 * Gets a list of all the component for a given category.
+	 * 
+	 * @param  category Category to search for components.
+	 * @return          A list of components in that category.
+	 */
+	public ArrayList<Component> getComponentsByCategories(ComponentCategory category) {
+		ArrayList<Component> components = new ArrayList<Component>();
+		ListIterator<Component> iter = componentIterator();
+		
+		// Go through components matching the category.
+		while (iter.hasNext()) {
+			Component comp = iter.next();
+			
+			if (category.equals(comp.getCategory())) {
+				components.add(comp);
+			}
+		}
+		
+		return components;
+	}
+	
+	/**
 	 * Gets a list of all the component categories (populated with sub-categories)
 	 * that are used in this workspace.
 	 * 
