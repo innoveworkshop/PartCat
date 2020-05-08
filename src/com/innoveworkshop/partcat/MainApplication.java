@@ -30,9 +30,16 @@ public class MainApplication {
 		String lastWorkspace = prefs.get(PartCatConstants.LAST_OPENED_WORKSPACE_KEY, null);
 		
 		// Open workspace.
-		workspace = null;
-		if (lastWorkspace != null)
-			workspace = new PartCatWorkspace(lastWorkspace);
+		try {
+			workspace = null;
+			if (lastWorkspace != null)
+				workspace = new PartCatWorkspace(lastWorkspace);
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("Looks like the last used workspace is no longer valid. " + 
+					"Ignoring...");
+			workspace = null;
+		}
 		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
