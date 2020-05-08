@@ -721,11 +721,17 @@ public class MainWindow {
 		txtFilter = new JTextField();
 		sl_leftPanel.putConstraint(SpringLayout.SOUTH, txtFilter, -5, SpringLayout.SOUTH, leftPanel);
 		sl_leftPanel.putConstraint(SpringLayout.SOUTH, sclTree, -5, SpringLayout.NORTH, txtFilter);
-		sl_leftPanel.putConstraint(SpringLayout.WEST, txtFilter, 0, SpringLayout.WEST, sclTree);
 		sl_leftPanel.putConstraint(SpringLayout.EAST, txtFilter, 0, SpringLayout.EAST, sclTree);
 		leftPanel.add(txtFilter);
 		txtFilter.setToolTipText("Filter");
 		txtFilter.setColumns(10);
+		
+		JLabel lblFilter = new JLabel("Filter");
+		sl_leftPanel.putConstraint(SpringLayout.WEST, txtFilter, 5, SpringLayout.EAST, lblFilter);
+		sl_leftPanel.putConstraint(SpringLayout.NORTH, lblFilter, 0, SpringLayout.NORTH, txtFilter);
+		sl_leftPanel.putConstraint(SpringLayout.WEST, lblFilter, 0, SpringLayout.WEST, sclTree);
+		sl_leftPanel.putConstraint(SpringLayout.SOUTH, lblFilter, 0, SpringLayout.SOUTH, txtFilter);
+		leftPanel.add(lblFilter);
 		txtFilter.getDocument().addDocumentListener(new DocumentListener() {
 			public void changedUpdate(DocumentEvent e) {
 				applyTreeFiltering(txtFilter.getText());
@@ -763,7 +769,6 @@ public class MainWindow {
 		txtName = new JTextField();
 		sl_rightPanel.putConstraint(SpringLayout.NORTH, txtName, 5, SpringLayout.NORTH, rightPanel);
 		sl_rightPanel.putConstraint(SpringLayout.WEST, txtName, 8, SpringLayout.EAST, lblName);
-		sl_rightPanel.putConstraint(SpringLayout.EAST, txtName, -5, SpringLayout.EAST, rightPanel);
 		sl_rightPanel.putConstraint(SpringLayout.SOUTH, lblName, 0, SpringLayout.SOUTH, txtName);
 		txtName.setEnabled(false);
 		rightPanel.add(txtName);
@@ -782,16 +787,18 @@ public class MainWindow {
 			}
 		});
 		
-		JLabel lblQuantity = new JLabel("Quantity");
-		sl_rightPanel.putConstraint(SpringLayout.NORTH, lblQuantity, 4, SpringLayout.SOUTH, lblName);
-		sl_rightPanel.putConstraint(SpringLayout.WEST, lblQuantity, 0, SpringLayout.WEST, lblName);
+		JLabel lblQuantity = new JLabel("Qnt");
+		sl_rightPanel.putConstraint(SpringLayout.WEST, lblQuantity, -90, SpringLayout.EAST, rightPanel);
+		sl_rightPanel.putConstraint(SpringLayout.EAST, txtName, -5, SpringLayout.WEST, lblQuantity);
+		sl_rightPanel.putConstraint(SpringLayout.NORTH, lblQuantity, 0, SpringLayout.NORTH, txtName);
+		sl_rightPanel.putConstraint(SpringLayout.SOUTH, lblQuantity, 0, SpringLayout.SOUTH, txtName);
 		rightPanel.add(lblQuantity);
 		
 		spnQuantity = new JSpinner();
+		sl_rightPanel.putConstraint(SpringLayout.NORTH, spnQuantity, 0, SpringLayout.NORTH, txtName);
+		sl_rightPanel.putConstraint(SpringLayout.WEST, spnQuantity, 5, SpringLayout.EAST, lblQuantity);
+		sl_rightPanel.putConstraint(SpringLayout.SOUTH, spnQuantity, 0, SpringLayout.SOUTH, txtName);
 		spnQuantity.setModel(new SpinnerNumberModel(Integer.valueOf(0), null, null, Integer.valueOf(1)));
-		sl_rightPanel.putConstraint(SpringLayout.NORTH, spnQuantity, 28, SpringLayout.NORTH, rightPanel);
-		sl_rightPanel.putConstraint(SpringLayout.WEST, spnQuantity, 8, SpringLayout.EAST, lblQuantity);
-		sl_rightPanel.putConstraint(SpringLayout.SOUTH, lblQuantity, 0, SpringLayout.SOUTH, spnQuantity);
 		sl_rightPanel.putConstraint(SpringLayout.EAST, spnQuantity, -5, SpringLayout.EAST, rightPanel);
 		rightPanel.add(spnQuantity);
 		spnQuantity.getEditor().getComponent(0);
@@ -807,7 +814,7 @@ public class MainWindow {
 		JPanel extrasPanel = new JPanel();
 		sl_rightPanel.putConstraint(SpringLayout.WEST, extrasPanel, 0, SpringLayout.EAST, lblImage);
 		sl_rightPanel.putConstraint(SpringLayout.SOUTH, extrasPanel, 0, SpringLayout.SOUTH, lblImage);
-		sl_rightPanel.putConstraint(SpringLayout.EAST, extrasPanel, 0, SpringLayout.EAST, txtName);
+		sl_rightPanel.putConstraint(SpringLayout.EAST, extrasPanel, 0, SpringLayout.EAST, spnQuantity);
 		rightPanel.add(extrasPanel);
 		
 		tblProperties = new JTable();
@@ -832,7 +839,7 @@ public class MainWindow {
 		sl_rightPanel.putConstraint(SpringLayout.NORTH, sclNotes, 4, SpringLayout.SOUTH, lblQuantity);
 		sl_rightPanel.putConstraint(SpringLayout.WEST, sclNotes, 0, SpringLayout.WEST, lblName);
 		sl_rightPanel.putConstraint(SpringLayout.SOUTH, sclNotes, -4, SpringLayout.NORTH, extrasPanel);
-		sl_rightPanel.putConstraint(SpringLayout.EAST, sclNotes, 0, SpringLayout.EAST, txtName);
+		sl_rightPanel.putConstraint(SpringLayout.EAST, sclNotes, 0, SpringLayout.EAST, spnQuantity);
 		rightPanel.add(sclNotes);
 		sclNotes.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		sl_rightPanel.putConstraint(SpringLayout.NORTH, tblProperties, 5, SpringLayout.SOUTH, lblImage);
@@ -869,7 +876,7 @@ public class MainWindow {
 		sl_rightPanel.putConstraint(SpringLayout.NORTH, sclTable, 8, SpringLayout.SOUTH, lblImage);
 		sl_rightPanel.putConstraint(SpringLayout.WEST, sclTable, 0, SpringLayout.WEST, lblImage);
 		sl_rightPanel.putConstraint(SpringLayout.SOUTH, sclTable, -5, SpringLayout.SOUTH, rightPanel);
-		sl_rightPanel.putConstraint(SpringLayout.EAST, sclTable, 0, SpringLayout.EAST, txtName);
+		sl_rightPanel.putConstraint(SpringLayout.EAST, sclTable, 0, SpringLayout.EAST, spnQuantity);
 		rightPanel.add(sclTable);
 		
 		DefaultTableModel table_model = new DefaultTableModel(new Object[][] {},
