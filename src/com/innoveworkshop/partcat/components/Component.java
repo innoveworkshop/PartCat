@@ -427,7 +427,45 @@ public class Component {
 	 * @see {@link ComponentCategory}
 	 */
 	public ComponentCategory getCategory() {
-		return new ComponentCategory(prop);
+		return new ComponentCategory(prop, false);
+	}
+	
+	/**
+	 * Checks if this component has a category attached to its properties.
+	 * 
+	 * @return True if the component properties has a category field.
+	 */
+	public boolean hasCategory() {
+		for (Map.Entry<String, String> entry : prop.entrySet()) {
+			if (entry.getKey().equals(PartCatConstants.PROPERTY_CATEGORY))
+				return true;
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * Gets the component sub category.
+	 * 
+	 * @return Component sub category.
+	 * @see {@link ComponentCategory}
+	 */
+	public ComponentCategory getSubCategory() {
+		return new ComponentCategory(prop, true);
+	}
+	
+	/**
+	 * Checks if this component has a sub category attached to its properties.
+	 * 
+	 * @return True if the component properties has a sub category field.
+	 */
+	public boolean hasSubCategory() {
+		for (Map.Entry<String, String> entry : prop.entrySet()) {
+			if (entry.getKey().equals(PartCatConstants.PROPERTY_SUBCATEGORY))
+				return true;
+		}
+		
+		return false;
 	}
 	
 	/**

@@ -225,9 +225,17 @@ public class MainWindow {
 		ListIterator<ComponentCategory> iterCategories = workspace.getComponentCategories().listIterator();
 		while (iterCategories.hasNext()) {
 			ComponentCategory cat = iterCategories.next();
-			DefaultMutableTreeNode node = new DefaultMutableTreeNode(cat.getName());
+			DefaultMutableTreeNode catNode = new DefaultMutableTreeNode(cat.getName());
 			ArrayList<Component> components = workspace.getComponentsByCategories(cat);
 			ListIterator<Component> iterComponents = components.listIterator();
+			
+			// Create sub category nodes.
+			ListIterator<ComponentCategory> iterSub = cat.getSubCategoriesIterator();
+			ArrayList<DefaultMutableTreeNode> subNodes = new ArrayList<DefaultMutableTreeNode>();
+			while (iterSub.hasNext()) {
+				ComponentCategory subCategory = iterSub.next();
+				subNodes.add(new DefaultMutableTreeNode(subCategory.getName()));
+			}
 
 			// Go through components adding them to the tree.
 			while (iterComponents.hasNext()) {
@@ -240,13 +248,39 @@ public class MainWindow {
 				}
 				
 				// Check if the component has been deleted before adding it.
-				if (!comp.isDeleted())
-					node.add(new ComponentTreeNode(comp));
+				if (!comp.isDeleted()) {
+					if (comp.hasSubCategory()) {
+						// Component is inside of a sub category.
+						ListIterator<DefaultMutableTreeNode> iterSubNodes = subNodes.listIterator();
+						while (iterSubNodes.hasNext()) {
+							DefaultMutableTreeNode subNode = iterSubNodes.next();
+							String nodeName = (String)(subNode.getUserObject());
+							
+							if (nodeName != null) {
+								if (nodeName.equals(comp.getSubCategory().getName())) {
+									subNode.add(new ComponentTreeNode(comp));
+									break;
+								}
+							}
+						}
+					} else {
+						// Component is just inside the category.
+						catNode.add(new ComponentTreeNode(comp));
+					}
+				}
+			}
+			
+			// TODO: Add the sub category nodes.
+			ListIterator<DefaultMutableTreeNode> iterSubNodes = subNodes.listIterator();
+			while (iterSubNodes.hasNext()) {
+				DefaultMutableTreeNode subNode = iterSubNodes.next();
+				if (!subNode.isLeaf())
+					catNode.add(subNode);
 			}
 			
 			// Add the category to the tree if it has any items.
-			if (!node.isLeaf())
-				root.add(node);
+			if (!catNode.isLeaf())
+				root.add(catNode);
 		}
 		
 		// Set the tree model and expand all the nodes.

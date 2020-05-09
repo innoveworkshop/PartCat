@@ -231,7 +231,37 @@ public class PartCatWorkspace {
 			}
 		}
 		
+		// Populate the categories with their respective sub categories.
+		ListIterator<ComponentCategory> iterCategories = categories.listIterator();
+		while (iterCategories.hasNext()) {
+			populateCategorySubCategories(iterCategories.next());
+		}
+		
 		return categories;
+	}
+	
+	/**
+	 * Populates the category object with its sub categories.
+	 * 
+	 * @param category Category to be populated with sub categories.
+	 */
+	private void populateCategorySubCategories(ComponentCategory category) {
+		ArrayList<Component> components = getComponentsByCategories(category);
+		ListIterator<Component> iterComponents = components.listIterator();
+		ArrayList<ComponentCategory> subCategories = new ArrayList<ComponentCategory>();
+
+		// Go through components looking for unique sub categories.
+		while (iterComponents.hasNext()) {
+			ComponentCategory cat = iterComponents.next().getSubCategory();
+			
+			// Looks like a unique sub category so far?
+			if (!subCategories.contains(cat)) {
+				subCategories.add(cat);
+			}
+		}
+		
+		// Set the sub categories list.
+		category.setSubCategories(subCategories);
 	}
 	
 	/**
