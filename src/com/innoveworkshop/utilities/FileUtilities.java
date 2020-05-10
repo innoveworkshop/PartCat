@@ -5,7 +5,12 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.CopyOption;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 
 /**
  * A simple class to help us with our file needs.
@@ -73,6 +78,31 @@ public class FileUtilities {
 		}
 		
 		return path.delete();
+	}
+	
+	/**
+	 * Copies a whole directory recursively.
+	 * 
+	 * @param source  {@link Path} to the source directory.
+	 * @param target  {@link Path} to the target directory.
+	 * @param options Necessary copy options.
+	 * 
+	 * @throws IOException If something goes wrong while copying.
+	 */
+	public void copyDirectory(Path source, Path target, CopyOption... options) throws IOException {
+		Files.walkFileTree(source, new SimpleFileVisitor<Path>() {
+			@Override
+			public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+				Files.createDirectories(target.resolve(source.relativize(dir)));
+				return FileVisitResult.CONTINUE;
+			}
+
+			@Override
+			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+				Files.copy(file, target.resolve(source.relativize(file)), options);
+				return FileVisitResult.CONTINUE;
+			}
+		});
 	}
 	
 	/**
