@@ -89,7 +89,11 @@ public class FileUtilities {
 	 * 
 	 * @throws IOException If something goes wrong while copying.
 	 */
-	public void copyDirectory(Path source, Path target, CopyOption... options) throws IOException {
+	public static void copyDirectory(Path source, Path target, CopyOption... options) throws IOException {
+		// Create the directory.
+		Files.createDirectory(target);
+		
+		// Copy directory contents recursively.
 		Files.walkFileTree(source, new SimpleFileVisitor<Path>() {
 			@Override
 			public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {

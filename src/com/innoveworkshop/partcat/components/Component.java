@@ -131,6 +131,31 @@ public class Component {
 			this.setNotes(null);
 		}
 	}
+
+	/**
+	 * Saves the component as a new one with a different name to disk.
+	 * 
+	 * @param name New component name.
+	 * 
+	 * @throws IOException When something wrong happens.
+	 */
+	public void saveAs(String name) throws IOException {
+		// Looks like it's the same name, so let's just save it and be done with it.
+		if (name.equals(getName())) {
+			save();
+			return;
+		}
+		
+		// Copy the source component folder first.
+		Path targetPath = path = workspace.getPath()
+				.resolve(PartCatConstants.COMPONENTS_ROOT).resolve(name);
+		FileUtilities.copyDirectory(path, targetPath, StandardCopyOption.COPY_ATTRIBUTES);
+		
+		// Remake this object into the new component and save.
+		this.path = targetPath;
+		this.name = name;
+		save();
+	}
 	
 	/**
 	 * Saves the component to disk. This will override all the files inside the

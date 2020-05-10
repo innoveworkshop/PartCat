@@ -728,7 +728,11 @@ public class MainWindow {
 		mnFile.add(mntmSave);
 		
 		JMenuItem mntmSaveAs = new JMenuItem("Save As...");
-		mntmSaveAs.setEnabled(false);
+		mntmSaveAs.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				action.saveComponentAs(currentComponent);
+			}
+		});
 		mnFile.add(mntmSaveAs);
 		
 		JSeparator separator = new JSeparator();

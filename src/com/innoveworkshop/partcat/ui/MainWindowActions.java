@@ -64,15 +64,61 @@ public class MainWindowActions {
 	 * @param component Component to be saved.
 	 */
 	public void saveComponent(Component component) {
+		saveComponent(component, null);
+	}
+	
+	/**
+	 * Saves a component to disk.
+	 * 
+	 * @param component Component to be saved.
+	 * @param newName   New component name in case of "Saving as".
+	 */
+	public void saveComponent(Component component, String newName) {
 		try {
 			window.syncComponentChanges();
-			component.save();
+			if (newName == null) {
+				component.save();
+			} else {
+				component.saveAs(newName);
+			}
+			
 			window.setUnsavedChanges(false);
 		} catch (IOException e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(window.frmPartcat,
 					"Something went wrong when trying to save the component.",
 					"Saving Error", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+	
+	/**
+	 * Saves a component "as" to disk.
+	 * 
+	 * @param component Component to be saved.
+	 */
+	public void saveComponentAs(Component component) {
+		String name = JOptionPane.showInputDialog(window.frmPartcat,
+				"Enter the new name for " + component.getName() + ":",
+				"Save " + component.getName() + " As",
+				JOptionPane.PLAIN_MESSAGE);
+		
+		// Check if the user hit the cancel button.
+		if (name == null)
+			return;
+		
+		// Check if the entered name is empty.
+		if (!name.isEmpty()) {
+			// Check if the component name already exists.
+			if (Component.exists(window.workspace, name)) {
+				JOptionPane.showMessageDialog(window.frmPartcat,
+						name + " is already in the workspace. Choose a different name.",
+						"Name Not Unique", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+	
+			// Finally save the component and refresh the workspace.
+			saveComponent(component, name);
+			refreshWorkspace();
 		}
 	}
 	
