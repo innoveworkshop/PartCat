@@ -118,7 +118,6 @@ public class MainWindow {
 		
 		// Initialize the UI controls.
 		initializeUIControls();
-		populateAppearanceMenu();
 		clearComponentTreeAndView();
 		setUnsavedChanges(false);
 	}
@@ -569,6 +568,10 @@ public class MainWindow {
 		LookAndFeelInfo looks[] = UIManager.getInstalledLookAndFeels();
 		LookAndFeel currentLook = UIManager.getLookAndFeel();
 		
+		// Ignore all this if the UI hasn't been initialized yet.
+		if (mnWidgetStyle == null)
+			return;
+		
 		// Clear the menu.
 		mnWidgetStyle.removeAll();
 		
@@ -607,11 +610,13 @@ public class MainWindow {
 	public void setSystemNativeLook() {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			populateAppearanceMenu();
 		} catch (Exception e) {
 			try {
 				System.err.println("Couldn't set the correct look and feel " +
 						"for this platform. Switching to default");
 				UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+				populateAppearanceMenu();
 			} catch (Exception e1) {
 				e1.printStackTrace();
 			}
@@ -631,6 +636,8 @@ public class MainWindow {
 			
 			if (setPref)
 				prefs.put(PartCatConstants.SELECTED_LOOK_FEEL_KEY, name);
+			
+			populateAppearanceMenu();
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.err.println("Couldn't set the look and feel '" + name +
