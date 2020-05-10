@@ -20,7 +20,7 @@ public class CategoryComparators {
 			if ((cat1 == null) || (cat2 == null))
 				return 0;
 			
-			if ((cat1.getName() == null) || (cat1.getName() == null))
+			if ((cat1.getName() == null) || (cat2.getName() == null))
 				return 0;
 			
 			return cat1.getName().compareToIgnoreCase(cat2.getName());
