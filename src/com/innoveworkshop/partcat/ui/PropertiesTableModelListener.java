@@ -4,6 +4,8 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 
+import com.innoveworkshop.partcat.PartCatConstants;
+
 /**
  * A simple class to handle all the properties table change events.
  * 
@@ -34,7 +36,7 @@ public class PropertiesTableModelListener implements TableModelListener {
 			if (e.getType() != TableModelEvent.DELETE) {
 				String row_key = (String)model.getValueAt(e.getFirstRow(), 0);
 			
-				if (row_key.equals("Package")) {
+				if (row_key.equals(PartCatConstants.PROPERTY_PACKAGE)) {
 					// We are dealing with a package change.
 					window.syncComponentChanges();
 					window.currentComponent.reloadImage();

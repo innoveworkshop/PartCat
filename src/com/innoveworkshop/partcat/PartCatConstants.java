@@ -31,4 +31,5 @@ public final class PartCatConstants {
 	// Special component property keys.
 	public static final String PROPERTY_CATEGORY = "Category";
 	public static final String PROPERTY_SUBCATEGORY = "Sub-Category";
+	public static final String PROPERTY_PACKAGE = "Package";
 }
