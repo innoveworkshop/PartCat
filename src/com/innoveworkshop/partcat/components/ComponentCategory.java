@@ -1,10 +1,12 @@
 package com.innoveworkshop.partcat.components;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.ListIterator;
 import java.util.Map;
 
 import com.innoveworkshop.partcat.PartCatConstants;
+import com.innoveworkshop.partcat.components.comparators.CategoryComparators;
 
 /**
  * A component category abstraction class.
@@ -98,6 +100,7 @@ public class ComponentCategory {
 	 */
 	public void setSubCategories(ArrayList<ComponentCategory> subCategories) {
 		this.subCategories = subCategories;
+		sortSubCategories();
 	}
 	
 	/**
@@ -125,6 +128,16 @@ public class ComponentCategory {
 	 */
 	public void setAsSubCategory(boolean isSubCategory) {
 		this.isSubCategory = isSubCategory;
+	}
+	
+	/**
+	 * Sorts the sub categories alphabetically.
+	 */
+	public void sortSubCategories() {
+		if (subCategories != null) {
+			CategoryComparators compars = new CategoryComparators();
+			Collections.sort(subCategories, compars.new Alphabetically());
+		}
 	}
 	
 	/**

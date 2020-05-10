@@ -6,11 +6,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 
 import com.innoveworkshop.partcat.components.Component;
 import com.innoveworkshop.partcat.components.ComponentCategory;
+import com.innoveworkshop.partcat.components.comparators.ComponentComparators;
 import com.innoveworkshop.partcat.exceptions.ComponentNotFoundException;
 import com.innoveworkshop.partcat.exceptions.WorkspaceNotFoundException;
 
@@ -205,6 +207,10 @@ public class PartCatWorkspace {
 				components.add(comp);
 			}
 		}
+		
+		// Sort the components alphabetically.
+		ComponentComparators compars = new ComponentComparators();
+		Collections.sort(components, compars.new Alphabetically());
 		
 		return components;
 	}

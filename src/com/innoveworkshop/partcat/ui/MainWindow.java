@@ -270,7 +270,7 @@ public class MainWindow {
 				}
 			}
 			
-			// TODO: Add the sub category nodes.
+			// Add the sub category nodes.
 			ListIterator<DefaultMutableTreeNode> iterSubNodes = subNodes.listIterator();
 			while (iterSubNodes.hasNext()) {
 				DefaultMutableTreeNode subNode = iterSubNodes.next();
