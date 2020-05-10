@@ -236,6 +236,9 @@ public class MainWindow {
 				ComponentCategory subCategory = iterSub.next();
 				subNodes.add(new DefaultMutableTreeNode(subCategory.getName()));
 			}
+			
+			// Create a list with the components that aren't inside a sub category.
+			ArrayList<ComponentTreeNode> nonSubTreeNodes = new ArrayList<ComponentTreeNode>();
 
 			// Go through components adding them to the tree.
 			while (iterComponents.hasNext()) {
@@ -265,7 +268,7 @@ public class MainWindow {
 						}
 					} else {
 						// Component is just inside the category.
-						catNode.add(new ComponentTreeNode(comp));
+						nonSubTreeNodes.add(new ComponentTreeNode(comp));
 					}
 				}
 			}
@@ -277,6 +280,11 @@ public class MainWindow {
 				if (!subNode.isLeaf())
 					catNode.add(subNode);
 			}
+			
+			// Now add all those non-sub category components, this way they are below the sub folders.
+			ListIterator<ComponentTreeNode> iterNonSub = nonSubTreeNodes.listIterator();
+			while (iterNonSub.hasNext())
+				catNode.add(iterNonSub.next());
 			
 			// Add the category to the tree if it has any items.
 			if (!catNode.isLeaf())
