@@ -31,13 +31,15 @@ public class PropertiesTableModelListener implements TableModelListener {
 		DefaultTableModel model = (DefaultTableModel)e.getSource();
 		
 		if (model.getRowCount() > 0) {
-			String row_key = (String)model.getValueAt(e.getFirstRow(), 0);
-		
-			if (row_key.equals("Package")) {
-				// We are dealing with a package change.
-				window.syncComponentChanges();
-				window.currentComponent.reloadImage();
-				window.setComponentImageLabel(window.currentComponent);
+			if (e.getType() != TableModelEvent.DELETE) {
+				String row_key = (String)model.getValueAt(e.getFirstRow(), 0);
+			
+				if (row_key.equals("Package")) {
+					// We are dealing with a package change.
+					window.syncComponentChanges();
+					window.currentComponent.reloadImage();
+					window.setComponentImageLabel(window.currentComponent);
+				}
 			}
 		}
 		
