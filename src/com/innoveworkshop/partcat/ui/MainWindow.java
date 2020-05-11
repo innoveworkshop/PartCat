@@ -696,7 +696,7 @@ public class MainWindow {
 			}
 		});
 		
-		dlgAbout = new AboutDialog();
+		dlgAbout = new AboutDialog(frmPartcat);
 		
 		JMenuBar menuBar = new JMenuBar();
 		frmPartcat.setJMenuBar(menuBar);

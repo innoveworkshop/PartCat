@@ -13,6 +13,7 @@ import java.net.URISyntaxException;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
@@ -24,6 +25,25 @@ import javax.swing.SwingConstants;
  */
 public class AboutDialog extends JDialog {
 	private static final long serialVersionUID = 8079171795639372073L;
+
+	/**
+	 * Creates the about dialog.
+	 */
+	public AboutDialog() {
+		this(null);
+	}
+	
+	/**
+	 * Creates the about dialog.
+	 * 
+	 * @param parent Parent window to center it on.
+	 */
+	public AboutDialog(JFrame parent) {
+		initializeUI();
+		
+		if (parent != null)
+			this.setLocationRelativeTo(parent);
+	}
 
 	/**
 	 * Opens URLs using the default browser.
@@ -41,11 +61,11 @@ public class AboutDialog extends JDialog {
 			}
 		}
 	}
-
+	
 	/**
-	 * Create the dialog.
+	 * Initializes the UI elements.
 	 */
-	public AboutDialog() {
+	public void initializeUI() {
 		setBounds(100, 100, 345, 220);
 		
 		JLabel lblIcon = new JLabel("");
@@ -97,7 +117,5 @@ public class AboutDialog extends JDialog {
 			}
 		});
 		panButtons.add(btnAuthor);
-
 	}
-
 }
