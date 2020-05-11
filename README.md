@@ -2,7 +2,7 @@
 
 Electronic components cataloger and organizer application.
 
-![Application Screenshot](/screenshots/2019-05-11.png?raw=true)
+![Application Screenshot](/screenshots/2020-05-11.png?raw=true)
 
 ## How it Works
 
