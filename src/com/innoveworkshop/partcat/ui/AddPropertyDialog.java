@@ -1,7 +1,6 @@
 package com.innoveworkshop.partcat.ui;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,6 +13,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -53,7 +53,7 @@ public class AddPropertyDialog extends JDialog {
 	/**
 	 * Shows the dialog and returns a reference to what option the user choose.
 	 * 
-	 * @param  parent Parent component. Used to properly place the dialog on
+	 * @param  parent Parent frame. Used to properly place the dialog on
 	 *                screen. This value can be {@code null}.
 	 * @return        The option the user selected before closing the dialog.
 	 *                This can be {@link AddPropertyDialog#ADD_PROPERTY_OPTION}
@@ -63,7 +63,7 @@ public class AddPropertyDialog extends JDialog {
 	 * @see {@link AddPropertyDialog#getName()}
 	 * @see {@link AddPropertyDialog#getValue()}
 	 */
-	public int showDialog(Component parent) {
+	public int showDialog(JFrame parent) {
 		if (parent != null)
 			this.setLocationRelativeTo(parent);
 		this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -93,7 +93,7 @@ public class AddPropertyDialog extends JDialog {
 		String name = (String)cmbName.getEditor().getItem();
 		
 		// Make the name string properly "property".
-		name = name.replace(' ', '-');
+		name = name.trim().replace(' ', '-');
 		if (isPropertyValue)
 			name = PartCatConstants.PROPERTY_VALUE + "-" + name;
 		

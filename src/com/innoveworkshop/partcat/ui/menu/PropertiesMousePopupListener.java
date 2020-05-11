@@ -47,11 +47,7 @@ public class PropertiesMousePopupListener extends MouseAdapter {
 		menuItem = new JMenuItem("Add");
 		menuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				AddPropertyDialog dialog = new AddPropertyDialog();
-				if (dialog.showDialog() == AddPropertyDialog.ADD_PROPERTY_OPTION) {
-					System.out.println(dialog.getName());
-					System.out.println(dialog.getValue());
-				}
+				addProperty();
 			}
 		});
 		popupMenu.add(menuItem);
@@ -93,16 +89,31 @@ public class PropertiesMousePopupListener extends MouseAdapter {
 	public void mouseClicked(MouseEvent e) {
 		if ((e.getClickCount() == 2) && isOutsideTable
 				&& (window.currentComponent != null)) {
-			addTableRow();
+			addProperty();
+		}
+	}
+	
+	/**
+	 * Add a property using the dialog.
+	 */
+	public void addProperty() {
+		AddPropertyDialog dialog = new AddPropertyDialog();
+		
+		if (dialog.showDialog(window.frmPartcat) == AddPropertyDialog.ADD_PROPERTY_OPTION) {
+			DefaultTableModel model = (DefaultTableModel)tblTable.getModel();
+			model.addRow(new Object[] { dialog.getName(), dialog.getValue() });
 		}
 	}
 	
 	/**
 	 * Adds a new blank row to the table.
+	 * 
+	 * @param key   Property key.
+	 * @param value Property value.
 	 */
-	public void addTableRow() {
+	public void addTableRow(String key, String value) {
 		DefaultTableModel model = (DefaultTableModel)tblTable.getModel();
-		model.addRow(new Object[] { "", "" });
+		model.addRow(new Object[] { key, value });
 		window.setUnsavedChanges(true);
 	}
 	
