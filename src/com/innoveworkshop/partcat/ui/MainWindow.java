@@ -120,6 +120,7 @@ public class MainWindow {
 		initializeUIControls();
 		clearComponentTreeAndView();
 		setUnsavedChanges(false);
+		populateAppearanceMenu();
 	}
 	
 	/**
