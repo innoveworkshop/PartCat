@@ -2,7 +2,7 @@
 
 Electronic components cataloger and organizer application.
 
-![Application Screenshot](/screenshots/2019-05-01.png?raw=true)
+![Application Screenshot](/screenshots/2019-05-11.png?raw=true)
 
 ## How it Works
 
@@ -13,14 +13,23 @@ Git (or whatever you prefer) repository and manage it that way.
 
 ## Installation
 
-Well, you can always just run the `PartCat.jar` file located inside `dist/`, but
-if you're running Linux you can go to the `dist/` directory and run the
-`install.sh` script there to automatically create system-wide files and make
-things easier on you.
+Well, you can always just run the `PartCat.jar` file located inside `dist/`.
+
+### Linux
+
+Go to the `dist/` directory and run the `install.sh` script there to
+automatically create system-wide files and make things easier on you.
+
+### Windows
+
+Go to the `dist/` directory inside the repository and copy the `PartCat.exe`
+executable to the appropriate places. It's entirely portable, given you also
+bundle Java with it, so you can place it together with a workspace inside a
+flash drive and have everything you need anywhere.
 
 ## Requirements
 
-  - Java 8
+  - Java Runtime Environment 8
 
 ## License
 
