@@ -149,7 +149,7 @@ public class AddPropertyDialog extends JDialog {
 	 * Initializes the UI components.
 	 */
 	private void initializeUI() {
-		setBounds(100, 100, 360, 165);
+		setBounds(100, 100, 360, 175);
 		setTitle("Add Component Property");
 		setModalityType(JDialog.ModalityType.APPLICATION_MODAL);
 		getContentPane().setLayout(new BorderLayout());
