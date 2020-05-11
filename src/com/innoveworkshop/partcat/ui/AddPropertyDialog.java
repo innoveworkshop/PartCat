@@ -3,6 +3,7 @@ package com.innoveworkshop.partcat.ui;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -20,23 +21,13 @@ import javax.swing.SwingConstants;
 import javax.swing.DefaultComboBoxModel;
 
 public class AddPropertyDialog extends JDialog {
+	public static final int CANCEL_OPTION = 0;
+	public static final int ADD_PROPERTY_OPTION = 1;
+	
 	private static final long serialVersionUID = 1100137279963592982L;
 	private final JPanel contentPanel = new JPanel();
 	private JComboBox<String> cmbName;
 	private JTextField txtValue;
-
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		try {
-			AddPropertyDialog dialog = new AddPropertyDialog();
-			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-			dialog.setVisible(true);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
 
 	/**
 	 * Creates the component property add dialog.
@@ -49,6 +40,40 @@ public class AddPropertyDialog extends JDialog {
 	}
 	
 	/**
+	 * Shows the dialog and returns a reference to what option the user choose.
+	 * 
+	 * @return The option the user selected before closing the dialog. This can be
+	 *         {@link AddPropertyDialog#ADD_PROPERTY_OPTION} or
+	 *         {@link AddPropertyDialog#CANCEL_OPTION}. Pretty self-explanatory.
+	 * 
+	 * @see {@link AddPropertyDialog#getName()}
+	 * @see {@link AddPropertyDialog#getValue()}
+	 */
+	public int showDialog() {
+		this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		this.setVisible(true);
+		
+		return CANCEL_OPTION;
+	}
+	
+	/**
+	 * Gets the name of the entered property.
+	 */
+	public String getName() {
+		// TODO: Handle "dashes" and empty strings.
+		return (String)cmbName.getEditor().getItem();
+	}
+	
+	/**
+	 * Gets the value of the property.
+	 * 
+	 * @return Property value.
+	 */
+	public String getValue() {
+		return txtValue.getText().trim();
+	}
+	
+	/**
 	 * Populate the name {@link JComboBox} with common used items.
 	 */
 	private void populateNameComboBox() {
@@ -57,8 +82,13 @@ public class AddPropertyDialog extends JDialog {
 		commons.add(PartCatConstants.PROPERTY_SUBCATEGORY);
 		commons.add(PartCatConstants.PROPERTY_PACKAGE);
 		
+		// Convert common properties array list into array for the model.
+		Object[] commonsObjects = commons.toArray();
+        String[] commonsStrings = Arrays.copyOf(commonsObjects, commonsObjects.length, 
+                                   String[].class);
+		
 		// Set the model and select the first item.
-		DefaultComboBoxModel<String> comboModel = new DefaultComboBoxModel<String>((String[])commons.toArray());
+		DefaultComboBoxModel<String> comboModel = new DefaultComboBoxModel<String>(commonsStrings);
 		cmbName.setModel(comboModel);
 		cmbName.setSelectedIndex(0);
 	}
@@ -68,6 +98,8 @@ public class AddPropertyDialog extends JDialog {
 	 */
 	private void initializeUI() {
 		setBounds(100, 100, 360, 165);
+		setTitle("Add Component Property");
+		setModalityType(JDialog.ModalityType.APPLICATION_MODAL);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);

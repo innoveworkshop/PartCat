@@ -11,6 +11,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
+import com.innoveworkshop.partcat.ui.AddPropertyDialog;
 import com.innoveworkshop.partcat.ui.MainWindow;
 
 /**
@@ -46,7 +47,11 @@ public class PropertiesMousePopupListener extends MouseAdapter {
 		menuItem = new JMenuItem("Add");
 		menuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				addTableRow();
+				AddPropertyDialog dialog = new AddPropertyDialog();
+				if (dialog.showDialog() == AddPropertyDialog.ADD_PROPERTY_OPTION) {
+					System.out.println(dialog.getName());
+					System.out.println(dialog.getValue());
+				}
 			}
 		});
 		popupMenu.add(menuItem);
