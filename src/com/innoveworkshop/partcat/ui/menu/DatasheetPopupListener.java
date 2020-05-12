@@ -7,14 +7,13 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
 import com.innoveworkshop.partcat.ui.MainWindow;
+import com.innoveworkshop.partcat.ui.dialog.DownloadDialog;
 
 /**
  * A mouse adapter class to handle the datasheet popup menu.
@@ -52,7 +51,8 @@ public class DatasheetPopupListener extends MouseAdapter {
 		menuItem = new JMenuItem("Download");
 		menuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				downloadDatasheet();
+				DownloadDialog download = new DownloadDialog(window.frmPartcat);
+				download.datasheet(window.currentComponent);
 			}
 		});
 		popupMenu.add(menuItem);
@@ -131,38 +131,6 @@ public class DatasheetPopupListener extends MouseAdapter {
 			JOptionPane.showMessageDialog(window.frmPartcat,
 					"An error occured while trying to open the datasheet with the default application.",
 					"Error Opening Datasheet", JOptionPane.ERROR_MESSAGE);
-		}
-	}
-	
-	/**
-	 * Downloadss the datasheet using the default application for it.
-	 */
-	public void downloadDatasheet() {
-		String strURL = JOptionPane.showInputDialog(window.frmPartcat,
-				"Enter the URL to download:", "Download Datasheet",
-				JOptionPane.PLAIN_MESSAGE);
-		
-		// Check if the user hit the cancel button or entered an empty string.
-		if (strURL == null)
-			return;
-		if (strURL.isEmpty())
-			return;
-		
-		try {
-			window.currentComponent.downloadDatasheet(new URL(strURL));
-			JOptionPane.showMessageDialog(window.frmPartcat,
-					"Datasheet downloaded successfully.", "Download Successful",
-					JOptionPane.INFORMATION_MESSAGE);
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-			JOptionPane.showMessageDialog(window.frmPartcat,
-					"This URL doesn't look valid.", "Malformed URL",
-					JOptionPane.ERROR_MESSAGE);
-		} catch (IOException e) {
-			e.printStackTrace();
-			JOptionPane.showMessageDialog(window.frmPartcat,
-					"Something went while downloading the datasheet.",
-					"Error Downloading", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 	
