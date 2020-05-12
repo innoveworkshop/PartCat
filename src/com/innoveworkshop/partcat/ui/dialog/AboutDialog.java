@@ -1,4 +1,4 @@
-package com.innoveworkshop.partcat.ui;
+package com.innoveworkshop.partcat.ui.dialog;
 
 import java.awt.BorderLayout;
 import java.awt.Desktop;

@@ -40,6 +40,16 @@ public class ImageMousePopupListener extends MouseAdapter {
 		});
 		popupMenu.add(menuItem);
 		
+		// Download image item.
+		menuItem = new JMenuItem("Download");
+		menuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				// TODO: Implement a download dialog and function here.
+				window.action.selectComponentImage(window.currentComponent);
+			}
+		});
+		popupMenu.add(menuItem);
+		
 		// Remove image item.
 		menuItem = new JMenuItem("Remove");
 		menuItem.addActionListener(new ActionListener() {

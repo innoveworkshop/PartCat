@@ -11,8 +11,8 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
-import com.innoveworkshop.partcat.ui.AddPropertyDialog;
 import com.innoveworkshop.partcat.ui.MainWindow;
+import com.innoveworkshop.partcat.ui.dialog.AddPropertyDialog;
 
 /**
  * A mouse adapter class to handle the properties table popup menu.

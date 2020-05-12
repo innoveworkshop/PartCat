@@ -59,6 +59,7 @@ import com.innoveworkshop.partcat.components.Component;
 import com.innoveworkshop.partcat.components.ComponentCategory;
 import com.innoveworkshop.partcat.components.ComponentProperties;
 import com.innoveworkshop.partcat.resources.ApplicationResources;
+import com.innoveworkshop.partcat.ui.dialog.AboutDialog;
 import com.innoveworkshop.partcat.ui.menu.ComponentMousePopupListener;
 import com.innoveworkshop.partcat.ui.menu.DatasheetPopupListener;
 import com.innoveworkshop.partcat.ui.menu.ImageMousePopupListener;
