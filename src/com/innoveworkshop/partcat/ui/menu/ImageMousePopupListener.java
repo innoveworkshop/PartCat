@@ -7,6 +7,7 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.JSeparator;
 
 import com.innoveworkshop.partcat.ui.MainWindow;
 
@@ -44,11 +45,13 @@ public class ImageMousePopupListener extends MouseAdapter {
 		menuItem = new JMenuItem("Download");
 		menuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				// TODO: Implement a download dialog and function here.
-				window.action.selectComponentImage(window.currentComponent);
+				window.action.downloadComponentImage(window.currentComponent);
 			}
 		});
 		popupMenu.add(menuItem);
+		
+		// Separator for safety.
+		popupMenu.add(new JSeparator());
 		
 		// Remove image item.
 		menuItem = new JMenuItem("Remove");

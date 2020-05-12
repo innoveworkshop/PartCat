@@ -13,6 +13,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import com.innoveworkshop.partcat.PartCatWorkspace;
 import com.innoveworkshop.partcat.components.Component;
 import com.innoveworkshop.partcat.exceptions.WorkspaceNotFoundException;
+import com.innoveworkshop.partcat.ui.dialog.DownloadDialog;
 
 /**
  * A class to organize the MainWindow action events.
@@ -32,10 +33,23 @@ public class MainWindowActions {
 	}
 	
 	/**
+	 * Sets the component image based on a file path and handles all the UI
+	 * changes.
+	 * 
+	 * @param component {@link Component} to have its image changed.
+	 * @param imgPath   {@link Path} to the image for this component.
+	 */
+	public void setComponentImage(Component component, Path imgPath) {
+		component.getImage().setPath(imgPath, component.getName());
+		window.setComponentImageLabel(component);
+		window.setUnsavedChanges(true);
+	}
+	
+	/**
 	 * Shows an open file chooser and updates the image asset of a component
 	 * object accordingly.
 	 * 
-	 * @param component Component to have its image changed.
+	 * @param component {@link Component} to have its image changed.
 	 */
 	public void selectComponentImage(Component component) {
 		// Setup the file chooser.
@@ -51,17 +65,32 @@ public class MainWindowActions {
 		
 		// Show the dialog and handle the open operation only if approved.
 		if (dialog.showDialog(window.frmPartcat, "Select Image") == JFileChooser.APPROVE_OPTION) {
-			component.getImage().setPath(dialog.getSelectedFile().toPath(),
-					component.getName());
-			window.setComponentImageLabel(component);
-			window.setUnsavedChanges(true);
+			setComponentImage(component, dialog.getSelectedFile().toPath());
 		}
+	}
+	
+	/**
+	 * Let's the user set a URL to download the image from and updates the image
+	 * asset of a component object accordingly.
+	 * 
+	 * @param component {@link Component} to have its image changed.
+	 */
+	public void downloadComponentImage(Component component) {
+		DownloadDialog download = new DownloadDialog(window.frmPartcat);
+		download.image(window.currentComponent);
+		
+		// TODO: Do all the things as if it were a selected file.
+		/*
+		// Show the dialog and handle the open operation only if approved.
+		if (dialog.showDialog(window.frmPartcat, "Select Image") == JFileChooser.APPROVE_OPTION) {
+			setComponentImage(component, dialog.getSelectedFile().toPath());
+		}*/
 	}
 	
 	/**
 	 * Saves a component to disk.
 	 * 
-	 * @param component Component to be saved.
+	 * @param component {@link Component} to be saved.
 	 */
 	public void saveComponent(Component component) {
 		saveComponent(component, null);
@@ -70,7 +99,7 @@ public class MainWindowActions {
 	/**
 	 * Saves a component to disk.
 	 * 
-	 * @param component Component to be saved.
+	 * @param component {@link Component} to be saved.
 	 * @param newName   New component name in case of "Saving as".
 	 */
 	public void saveComponent(Component component, String newName) {
@@ -94,7 +123,7 @@ public class MainWindowActions {
 	/**
 	 * Saves a component "as" to disk.
 	 * 
-	 * @param component Component to be saved.
+	 * @param component {@link Component} to be saved.
 	 */
 	public void saveComponentAs(Component component) {
 		String name = JOptionPane.showInputDialog(window.frmPartcat,

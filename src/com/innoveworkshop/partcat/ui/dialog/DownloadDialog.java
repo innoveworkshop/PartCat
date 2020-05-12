@@ -1,8 +1,13 @@
 package com.innoveworkshop.partcat.ui.dialog;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -31,27 +36,57 @@ public class DownloadDialog {
 	}
 	
 	/**
+	 * Downloads an image for the user.
+	 * 
+	 * @param  component {@link Component} that will have the image downloaded.
+	 * @return           {@link Path} to the downloaded image or {@code null} if
+	 *                   there were any problems.
+	 */
+	public Path image(Component component) {
+		try {
+			// Get the URL from the user.
+			URL url = getURL(IMAGE_FILE);
+			
+			if (url != null) {
+				InputStream in = url.openStream();
+				String mime = URLConnection.guessContentTypeFromStream(in);
+				System.out.println(mime);
+				//Files.copy(in, getDatasheet(), StandardCopyOption.REPLACE_EXISTING);
+				downloadSuccessfulMessage(IMAGE_FILE);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			downloadErrorMessage(IMAGE_FILE);
+			
+		}
+		
+		return null;
+	}
+	
+	/**
 	 * Downloads a datasheet for the user.
 	 * 
-	 * @param component Component that will have the datasheet downloaded for.
+	 * @param  component {@link Component} that will have the datasheet downloaded.
+	 * @return           {@link Path} to the downloaded datasheet or {@code null}
+	 *                   if there were any problems.
 	 */
-	public void datasheet(Component component) {
+	public Path datasheet(Component component) {
 		try {
 			// Get the URL from the user.
 			URL url = getURL(DATASHEET_FILE);
 			
 			if (url != null) {
 				component.downloadDatasheet(url);
-				JOptionPane.showMessageDialog(parent,
-						"Datasheet downloaded successfully.", "Download Successful",
-						JOptionPane.INFORMATION_MESSAGE);
+				downloadSuccessfulMessage(DATASHEET_FILE);
+				
+				return component.getDatasheet();
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
-			JOptionPane.showMessageDialog(parent,
-					"Something went while downloading the datasheet.",
-					"Error Downloading", JOptionPane.ERROR_MESSAGE);
+			downloadErrorMessage(DATASHEET_FILE);
 		}
+		
+		return null;
 	}
 	
 	/**
@@ -64,7 +99,7 @@ public class DownloadDialog {
 	 */
 	public URL getURL(String fileType) {
 		String strURL = JOptionPane.showInputDialog(parent,
-				"Enter the URL to download:", "Download " + fileType,
+				"Enter the URL to download: ", "Download " + fileType,
 				JOptionPane.PLAIN_MESSAGE);
 		
 		// Check if the user hit the cancel button or entered an empty string.
@@ -83,5 +118,31 @@ public class DownloadDialog {
 		}
 		
 		return null;
+	}
+	
+	/**
+	 * Shows a friendly error message that something went wrong while trying to
+	 * download a file.
+	 * 
+	 * @param fileType Name of the type of file to get from the user. This is
+	 *                 used to display a nice message for the user.
+	 */
+	private void downloadSuccessfulMessage(String fileType) {
+		JOptionPane.showMessageDialog(parent,
+				fileType + " downloaded successfully.", "Download Successful",
+				JOptionPane.INFORMATION_MESSAGE);
+	}
+	
+	/**
+	 * Shows a friendly error message that something went wrong while trying to
+	 * download a file.
+	 * 
+	 * @param fileType Name of the type of file to get from the user. This is
+	 *                 used to display a nice message for the user.
+	 */
+	private void downloadErrorMessage(String fileType) {
+		JOptionPane.showMessageDialog(parent,
+				"Something went while downloading the " + fileType.toLowerCase() + ".",
+				"Error Downloading", JOptionPane.ERROR_MESSAGE);
 	}
 }

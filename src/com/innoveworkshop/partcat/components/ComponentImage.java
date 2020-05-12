@@ -65,6 +65,31 @@ public class ComponentImage {
 		this(workspace, name);
 		this.usingDefault = isDefault;
 	}
+
+	/**
+	 * Checks if a name matches the name of an image (filename without the
+	 * extension) in the images directory.
+	 * 
+	 * @param  name Filename without the extension to be matched against.
+	 * @return      Path to the file if it exists, otherwise NULL.
+	 */
+	public Path matchesName(String name) {
+		// Check if we actually have a name.
+		if (name == null)
+			return null;
+		
+		// Go through images looking for one that actually has the name we want.
+		File[] contents = workspace.getImagesPath().toFile().listFiles();
+		if (contents != null) {
+			for (File file : contents) {
+				if (FileUtilities.getFilenameWithoutExt(file.toPath()).equals(name)) {
+					return file.toPath();
+				}
+			}
+		}
+		
+		return null;
+	}
 	
 	/**
 	 * Gets the name of the image.
@@ -212,30 +237,5 @@ public class ComponentImage {
 	 */
 	public boolean isUsingDefaults() {
 		return usingDefault;
-	}
-
-	/**
-	 * Checks if a name matches the name of an image (filename without the
-	 * extension) in the images directory.
-	 * 
-	 * @param  name Filename without the extension to be matched against.
-	 * @return      Path to the file if it exists, otherwise NULL.
-	 */
-	public Path matchesName(String name) {
-		// Check if we actually have a name.
-		if (name == null)
-			return null;
-		
-		// Go through images looking for one that actually has the name we want.
-		File[] contents = workspace.getImagesPath().toFile().listFiles();
-		if (contents != null) {
-			for (File file : contents) {
-				if (FileUtilities.getFilenameWithoutExt(file.toPath()).equals(name)) {
-					return file.toPath();
-				}
-			}
-		}
-		
-		return null;
 	}
 }
