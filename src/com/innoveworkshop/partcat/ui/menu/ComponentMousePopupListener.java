@@ -9,6 +9,7 @@ import java.io.IOException;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.JSeparator;
 import javax.swing.JTree;
 import javax.swing.tree.TreePath;
 
@@ -25,6 +26,7 @@ public class ComponentMousePopupListener extends MouseAdapter {
 	private MainWindow window;
 	private JTree treeView;
 	public JPopupMenu popupMenu;
+	public JMenuItem mitmRename;
 	public JMenuItem mitmDelete;
 	public Component selComponent;
 	
@@ -52,6 +54,43 @@ public class ComponentMousePopupListener extends MouseAdapter {
 			}
 		});
 		popupMenu.add(menuItem);
+		
+		// Rename component item.
+		mitmRename = new JMenuItem("Rename");
+		mitmRename.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (window.defaultUnsavedChangesBehaviour())
+					return;
+				
+				String name = JOptionPane.showInputDialog(window.frmPartcat,
+						"Enter the new name for " + selComponent.getName() + ": ",
+						"Rename " + selComponent.getName(), JOptionPane.PLAIN_MESSAGE);
+				
+				// Check if the user hit the cancel button or entered an empty string.
+				if (name == null)
+					return;
+				if (name.isEmpty())
+					return;
+				
+				// Rename the component.
+				try {
+					selComponent.rename(name);
+				} catch (IOException e1) {
+					e1.printStackTrace();
+					JOptionPane.showMessageDialog(window.frmPartcat,
+							"Something went wrong while trying to rename " + selComponent.getName(),
+							"Renaming Error", JOptionPane.ERROR_MESSAGE);
+				}
+				
+				// Refresh the workspace after the changes.
+				window.action.refreshWorkspace();
+			}
+		});
+		popupMenu.add(mitmRename);
+		
+		// Separator for safety.
+		popupMenu.add(new JSeparator());
 		
 		// Delete component item.
 		mitmDelete = new JMenuItem("Delete");
@@ -87,7 +126,7 @@ public class ComponentMousePopupListener extends MouseAdapter {
 	@Override
 	public void mousePressed(MouseEvent e) {
 		if (e.isPopupTrigger() && window.workspace.isOpen()) {
-			enableDeleteMenu(getComponentFromPosition(e.getX(), e.getY()));
+			enableMenusIfOverComponent(e);
 			popupMenu.show(e.getComponent(), e.getX(), e.getY());
 		}
 	}
@@ -95,7 +134,7 @@ public class ComponentMousePopupListener extends MouseAdapter {
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		if (e.isPopupTrigger() && window.workspace.isOpen()) {
-			enableDeleteMenu(getComponentFromPosition(e.getX(), e.getY()));
+			enableMenusIfOverComponent(e);
 			popupMenu.show(e.getComponent(), e.getX(), e.getY());
 		}
 	}
@@ -124,11 +163,19 @@ public class ComponentMousePopupListener extends MouseAdapter {
 	}
 	
 	/**
-	 * Manages if we should enable or disable the delete item.
+	 * Enables or disables specific menu items that should only be enabled if
+	 * the mouse is over a valid component item.
 	 * 
-	 * @param enable Should we enable the menu item?
+	 * @param e {@link MouseEvent} that triggered the menu.
 	 */
-	private void enableDeleteMenu(boolean enable) {
-		mitmDelete.setEnabled(enable);
+	private void enableMenusIfOverComponent(MouseEvent e) {
+		if (window.workspace.isOpen()) {
+			// Get component from mouse position.
+			boolean enable = getComponentFromPosition(e.getX(), e.getY());
+			
+			// Enable menus accordingly.
+			mitmRename.setEnabled(enable);
+			mitmDelete.setEnabled(enable);
+		}
 	}
 }

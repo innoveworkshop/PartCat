@@ -194,6 +194,17 @@ public class Component {
 	}
 	
 	/**
+	 * Renames the component and its folder.
+	 * 
+	 * @param name New name to rename the component to.
+	 * 
+	 * @throws IOException If anything bad happens during the rename operation.
+	 */
+	public void rename(String name) throws IOException {
+		path = Files.move(path, path.resolveSibling(name));
+	}
+	
+	/**
 	 * Deletes the whole component folder.
 	 * 
 	 * @throws IOException If there's any issues while deleting the directory.
