@@ -204,15 +204,6 @@ public class MainWindow {
 	}
 	
 	/**
-	 * Expands all of the noeds in the component tree view.
-	 */
-	public void expandAllTreeNodes() {
-		for (int i = 0; i < treeComponents.getRowCount(); i++) {
-			treeComponents.expandRow(i);
-		}
-	}
-	
-	/**
 	 * Populates the tree view applying an optional filtering {@link String}.
 	 * 
 	 * @param filter A filtering string to be applied when populating.
@@ -333,7 +324,7 @@ public class MainWindow {
 	 * 
 	 * @param component Component to be shown/edited.
 	 */
-	protected void showComponent(Component component) {
+	public void showComponent(Component component) {
 		// Re-enable everything.
 		txtName.setEnabled(false);
 		spnQuantity.setEnabled(true);
@@ -362,9 +353,19 @@ public class MainWindow {
 	}
 	
 	/**
-	 * Clears the component view area.
+	 * Clears the component view area and also clears the current component
+	 * reference.
 	 */
-	protected void clearComponentView() {
+	public void clearComponentView() {
+		clearComponentView(true);
+	}
+	
+	/**
+	 * Clears the component view area.
+	 * 
+	 * @param clearCurrentComponent Clear the current component reference?
+	 */
+	public void clearComponentView(boolean clearCurrentComponent) {
 		// Image controls.
 		setComponentImageLabel(null);
 		
@@ -385,8 +386,10 @@ public class MainWindow {
 		btnExtras.setEnabled(false);
 		
 		// Component.
-		currentComponent = null;
-		setUnsavedChanges(false);
+		if (clearCurrentComponent) {
+			currentComponent = null;
+			setUnsavedChanges(false);
+		}
 	}
 	
 	/**
@@ -419,11 +422,33 @@ public class MainWindow {
 	}
 	
 	/**
-	 * Clears all the content from the component tree and its view.
+	 * Clears all the content from the component tree and its view, while also
+	 * clearing the current component reference.
 	 */
 	public void clearComponentTreeAndView() {
+		clearComponentTreeAndView(true);
+	}
+	
+	/**
+	 * Clears all the content from the component tree and its view.
+	 * 
+	 * @param clearCurrentComponent Clear the current component reference?
+	 */
+	public void clearComponentTreeAndView(boolean clearCurrentComponent) {
 		treeComponents.setModel(null);
-		clearComponentView();
+		clearComponentView(clearCurrentComponent);
+	}
+	
+	/**
+	 * Restores the state of things regarding the last selected component. This
+	 * is used to reset the application to the state it was before a workspace
+	 * refresh operation.
+	 */
+	public void restoreSelectedComponent() {
+		if (currentComponent != null) {
+			setCurrentComponent(currentComponent);
+			// TODO: Select the component on the tree view.
+		}
 	}
 	
 	/**
@@ -601,6 +626,15 @@ public class MainWindow {
 			
 			// Append to the parent menu.
 			mnWidgetStyle.add(mnuItem);
+		}
+	}
+	
+	/**
+	 * Expands all of the noeds in the component tree view.
+	 */
+	public void expandAllTreeNodes() {
+		for (int i = 0; i < treeComponents.getRowCount(); i++) {
+			treeComponents.expandRow(i);
 		}
 	}
 	

@@ -263,7 +263,17 @@ public class MainWindowActions {
 	 * @param workspace Workspace to open in the window.
 	 */
 	public void openWorkspace(PartCatWorkspace workspace) {
-		closeWorkspace();
+		openWorkspace(workspace, false);
+	}
+	
+	/**
+	 * Open a specified workspace.
+	 * 
+	 * @param workspace    Workspace to open in the window.
+	 * @param isRefreshing Are we doing just a workspace refresh?
+	 */
+	public void openWorkspace(PartCatWorkspace workspace, boolean isRefreshing) {
+		closeWorkspace(isRefreshing);
 		window.setWorkspace(workspace);
 		window.populateComponentsTree();
 		window.setUnsavedChanges(false);
@@ -277,8 +287,12 @@ public class MainWindowActions {
 		try {
 			Path path = window.workspace.getPath();
 			
-			closeWorkspace();
-			openWorkspace(new PartCatWorkspace(path));
+			// Actually refresh the workspace.
+			closeWorkspace(true);
+			openWorkspace(new PartCatWorkspace(path), true);
+			
+			// Reload the component that was last in use.
+			window.restoreSelectedComponent();
 		} catch (WorkspaceNotFoundException e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(window.frmPartcat,
@@ -291,8 +305,17 @@ public class MainWindowActions {
 	 * Closes the currently opened workspace.
 	 */
 	public void closeWorkspace() {
+		closeWorkspace(false);
+	}
+	
+	/**
+	 * Closes the currently opened workspace.
+	 * 
+	 * @param isRefreshing Are we doing just a workspace refresh?
+	 */
+	public void closeWorkspace(boolean isRefreshing) {
 		window.setUnsavedChanges(false);
-		window.clearComponentTreeAndView();
+		window.clearComponentTreeAndView(!isRefreshing);
 		
 		if (window.workspace != null)
 			window.workspace.close();
