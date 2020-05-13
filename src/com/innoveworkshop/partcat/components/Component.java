@@ -2,7 +2,6 @@ package com.innoveworkshop.partcat.components;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -396,8 +395,7 @@ public class Component {
 	 * @throws IOException If something went wrong when downloading.
 	 */
 	public void downloadDatasheet(URL url) throws IOException {
-		InputStream in = url.openStream();
-		Files.copy(in, getDatasheet(), StandardCopyOption.REPLACE_EXISTING);
+		FileUtilities.downloadFile(url, getDatasheet());
 	}
 	
 	/**

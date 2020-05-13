@@ -64,9 +64,8 @@ public class MainWindowActions {
 		dialog.setFileFilter(filter);
 		
 		// Show the dialog and handle the open operation only if approved.
-		if (dialog.showDialog(window.frmPartcat, "Select Image") == JFileChooser.APPROVE_OPTION) {
+		if (dialog.showDialog(window.frmPartcat, "Select Image") == JFileChooser.APPROVE_OPTION)
 			setComponentImage(component, dialog.getSelectedFile().toPath());
-		}
 	}
 	
 	/**
@@ -76,15 +75,13 @@ public class MainWindowActions {
 	 * @param component {@link Component} to have its image changed.
 	 */
 	public void downloadComponentImage(Component component) {
+		// Download the image to a temporary directory.
 		DownloadDialog download = new DownloadDialog(window.frmPartcat);
-		download.image(window.currentComponent);
+		Path imgPath = download.image(window.currentComponent);
 		
-		// TODO: Do all the things as if it were a selected file.
-		/*
-		// Show the dialog and handle the open operation only if approved.
-		if (dialog.showDialog(window.frmPartcat, "Select Image") == JFileChooser.APPROVE_OPTION) {
-			setComponentImage(component, dialog.getSelectedFile().toPath());
-		}*/
+		// Set the image as if it were selected from the open dialog.
+		if (imgPath != null)
+			setComponentImage(component, imgPath);
 	}
 	
 	/**

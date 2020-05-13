@@ -1,18 +1,16 @@
 package com.innoveworkshop.partcat.ui.dialog;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.Paths;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import com.innoveworkshop.partcat.components.Component;
+import com.innoveworkshop.utilities.FileUtilities;
 
 /**
  * A simple class to help us deal with our download dialogs.
@@ -36,7 +34,7 @@ public class DownloadDialog {
 	}
 	
 	/**
-	 * Downloads an image for the user.
+	 * Downloads an image for the user and stores it in a temporary directory.
 	 * 
 	 * @param  component {@link Component} that will have the image downloaded.
 	 * @return           {@link Path} to the downloaded image or {@code null} if
@@ -48,16 +46,16 @@ public class DownloadDialog {
 			URL url = getURL(IMAGE_FILE);
 			
 			if (url != null) {
-				InputStream in = url.openStream();
-				String mime = URLConnection.guessContentTypeFromStream(in);
-				System.out.println(mime);
-				//Files.copy(in, getDatasheet(), StandardCopyOption.REPLACE_EXISTING);
+				// Download the image to a temporary directory.
+				Path tmpDir = Paths.get(System.getProperty("java.io.tmpdir"));
+				Path tmpFile = FileUtilities.downloadFile(url, tmpDir, component.getName());
+				
 				downloadSuccessfulMessage(IMAGE_FILE);
+				return tmpFile;
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 			downloadErrorMessage(IMAGE_FILE);
-			
 		}
 		
 		return null;

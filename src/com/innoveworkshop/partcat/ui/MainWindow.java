@@ -106,7 +106,6 @@ public class MainWindow {
 
 	/**
 	 * Creates the main frame.
-	 * 
 	 * @wbp.parser.constructor
 	 */
 	public MainWindow() {

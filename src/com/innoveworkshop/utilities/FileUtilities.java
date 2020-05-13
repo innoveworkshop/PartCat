@@ -5,11 +5,15 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.file.CopyOption;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 
 /**
@@ -60,6 +64,50 @@ public class FileUtilities {
 		FileOutputStream outStream = new FileOutputStream(file);
 		outStream.write(contents.getBytes());
 		outStream.close();
+	}
+	
+	/**
+	 * Downloads a file from a {@link URL} to a directory with a file name. The
+	 * extension will be added automatically after it's detected by this function.
+	 * The final path will look kind of like {@code dir/name.ext}. This function overwrites
+	 * the output file if it already exists.
+	 * 
+	 * @param url  {@link URL} to get the file from.
+	 * @param path {@link Path} to the output file.
+	 * 
+	 * @throws IOException If anything goes wrong while trying to download the file.
+	 */
+	public static Path downloadFile(URL url, Path dir, String name) throws IOException {
+		// Open the connection.
+		URLConnection connection = url.openConnection();
+		connection.setConnectTimeout(1000);
+		
+		// Get file MIME type.
+		InputStream in = connection.getInputStream();
+		String mime = URLConnection.guessContentTypeFromName(url.toString());
+		
+		// Create a file path and download the file to it.
+		Path path = dir.resolve(name + "." + getExtensionFromMimeType(mime));
+		Files.copy(in, path, StandardCopyOption.REPLACE_EXISTING);
+		
+		return path;
+	}
+	
+	/**
+	 * Downloads a file from a {@link URL} to a {@link Path}. This function overwrites
+	 * the output file if it already exists.
+	 * 
+	 * @param url  {@link URL} to get the file from.
+	 * @param path {@link Path} to the output file.
+	 * 
+	 * @throws IOException If anything goes wrong while trying to download the file.
+	 */
+	public static void downloadFile(URL url, Path path) throws IOException {
+		URLConnection connection = url.openConnection();
+		connection.setConnectTimeout(1000);
+		
+		InputStream in = connection.getInputStream();
+		Files.copy(in, path, StandardCopyOption.REPLACE_EXISTING);
 	}
 	
 	/**
@@ -160,5 +208,16 @@ public class FileUtilities {
 	 */
     public static String getFileExtension(Path path) {
     	return getFileExtension(path, false);
+    }
+    
+    /**
+     * Gets the usual file extension for a given MIME type.
+     * 
+     * @param  mimeType A MIME type.
+     * @return          File extension for said MIME type.
+     */
+    public static String getExtensionFromMimeType(String mimeType) {
+    	// TODO: Improve this with a simple lookup table.
+    	return mimeType.substring(mimeType.lastIndexOf('/') + 1);
     }
 }
