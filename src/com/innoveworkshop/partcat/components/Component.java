@@ -510,6 +510,24 @@ public class Component {
 	public String getPackage() {
 		return prop.get("Package");
 	}
+	
+	/**
+	 * Checks if a component is the same as the other one based on its name.
+	 * 
+	 * @param  component Comparing component object.
+	 * @return           True if the components are equal.
+	 */
+	@Override
+	public boolean equals(Object component) {
+		if (component instanceof Component) {
+			if (this.getName() == null)
+				return false;
+			
+			return this.getName().equals(((Component)component).getName());
+		}
+		
+		return false;
+	}
 
 	/**
 	 * Gets a string representation of the component in the form of a summary.

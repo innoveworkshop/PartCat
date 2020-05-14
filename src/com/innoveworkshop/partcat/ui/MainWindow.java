@@ -446,6 +446,17 @@ public class MainWindow {
 	 */
 	public void restoreSelectedComponent() {
 		if (currentComponent != null) {
+			// Look for the last current component in the new, reloaded, workspace.
+			ListIterator<Component> iterComponents = workspace.componentIterator();
+			while (iterComponents.hasNext()) {
+				Component comp = iterComponents.next();
+				if (comp.equals(currentComponent)) {
+					currentComponent = comp;
+					break;
+				}
+			}
+			
+			// Restore the controls.
 			setCurrentComponent(currentComponent);
 			// TODO: Select the component on the tree view.
 		}
