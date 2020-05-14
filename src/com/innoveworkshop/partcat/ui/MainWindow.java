@@ -9,6 +9,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.ListIterator;
 import java.util.Map;
@@ -52,6 +53,8 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.text.DefaultFormatter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 
 import com.innoveworkshop.partcat.PartCatConstants;
 import com.innoveworkshop.partcat.PartCatWorkspace;
@@ -446,19 +449,9 @@ public class MainWindow {
 	 */
 	public void restoreSelectedComponent() {
 		if (currentComponent != null) {
-			// Look for the last current component in the new, reloaded, workspace.
-			ListIterator<Component> iterComponents = workspace.componentIterator();
-			while (iterComponents.hasNext()) {
-				Component comp = iterComponents.next();
-				if (comp.equals(currentComponent)) {
-					currentComponent = comp;
-					break;
-				}
-			}
-			
-			// Restore the controls.
-			setCurrentComponent(currentComponent);
-			// TODO: Select the component on the tree view.
+			// Select the last selected component. This will automatically
+			// refresh the currentComponent reference.
+			selectComponentOnTree(currentComponent);
 		}
 	}
 	
@@ -641,7 +634,32 @@ public class MainWindow {
 	}
 	
 	/**
-	 * Expands all of the noeds in the component tree view.
+	 * Selects a component in the tree view.
+	 * 
+	 * @param component {@link Component} object to be selected.
+	 */
+	public void selectComponentOnTree(Component component) {
+		DefaultMutableTreeNode root = (DefaultMutableTreeNode)(treeComponents.getModel().getRoot());
+		Enumeration<TreeNode> e = root.depthFirstEnumeration();
+		
+		// Go through the tree view checking for the component node.
+		while (e.hasMoreElements()) {
+			TreeNode node = e.nextElement();
+			if (node instanceof ComponentTreeNode) {
+				if (((ComponentTreeNode) node).getComponent().equals(component)) {
+					TreePath treePath = new TreePath(((DefaultMutableTreeNode) node).getPath());
+					
+					treeComponents.setSelectionPath(treePath);
+					treeComponents.scrollPathToVisible(treePath);
+					
+					return;
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Expands all of the nodes in the component tree view.
 	 */
 	public void expandAllTreeNodes() {
 		for (int i = 0; i < treeComponents.getRowCount(); i++) {

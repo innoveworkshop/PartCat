@@ -202,6 +202,7 @@ public class Component {
 	 */
 	public void rename(String name) throws IOException {
 		path = Files.move(path, path.resolveSibling(name));
+		this.name = name;
 	}
 	
 	/**
