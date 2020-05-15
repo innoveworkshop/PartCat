@@ -101,14 +101,19 @@ public class MainWindowActions {
 	 */
 	public void saveComponent(Component component, String newName) {
 		try {
+			// Sync our changes with the component object.
 			window.syncComponentChanges();
+			
+			// Decide if we are saving or saving as.
 			if (newName == null) {
 				component.save();
 			} else {
 				component.saveAs(newName);
 			}
 			
+			// Reset the saved changes flag and refresh the workspace.
 			window.setUnsavedChanges(false);
+			refreshWorkspace();
 		} catch (IOException e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(window.frmPartcat,
@@ -142,9 +147,8 @@ public class MainWindowActions {
 				return;
 			}
 	
-			// Finally save the component and refresh the workspace.
+			// Finally save the component as usual.
 			saveComponent(component, name);
-			refreshWorkspace();
 		}
 	}
 	
