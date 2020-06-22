@@ -11,6 +11,14 @@ its files, no databases involved. This way you can easily move your library
 around, sync it between computers, and even place your whole library inside a
 Git (or whatever you prefer) repository and manage it that way.
 
+## Ports
+
+Even though this application is written in Java in order to maximize
+portability, some platforms require special attention. This list contains ports
+of this application to other systems:
+
+  - [Windows CE/PocketPC](https://github.com/innoveworkshop/PartCatCE)
+
 ## Installation
 
 Well, you can always just run the `PartCat.jar` file located inside `dist/`.
