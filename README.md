@@ -11,13 +11,18 @@ its files, no databases involved. This way you can easily move your library
 around, sync it between computers, and even place your whole library inside a
 Git (or whatever you prefer) repository and manage it that way.
 
-## Ports
+## Ports and Companion Applications
 
 Even though this application is written in Java in order to maximize
 portability, some platforms require special attention. This list contains ports
 of this application to other systems:
 
   - [Windows CE/PocketPC](https://github.com/innoveworkshop/PartCatCE)
+
+In order to extend this program there's also a selection of companion applications
+so that you can make the most out of it:
+
+  - [Order Importer](https://github.com/innoveworkshop/PartCat-OrderImporter)
 
 ## Installation
 
